@@ -31,10 +31,10 @@ static void window_title_save(Plugin *p, FILE *fp) {
 static void window_title_panel_config_changed(Plugin *p) {
 }
 
-PluginClass windowtitle_plugin_class = {
+PluginClass libwindowtitle_plugin_class = {
     PLUGINCLASS_VERSIONING,
 
-    type : "windowtitle",
+    type : "libwindowtitle",
     name : "Window Title Plugin",
     version : "0.1",
     description : "Shows window title on panel",
