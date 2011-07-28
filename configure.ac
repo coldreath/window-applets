@@ -16,5 +16,6 @@ PKG_CHECK_MODULES(LXDE_PANEL, lxpanel)
 AC_CONFIG_FILES([Makefile
                  xfce/Makefile
                  lxde/Makefile
-                 title/Makefile])
+                 title/Makefile
+                 buttons/Makefile])
 AC_OUTPUT

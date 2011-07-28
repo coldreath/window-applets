@@ -1,7 +1,8 @@
 SUBDIRS = \
 	xfce \
 	lxde \
-	title
+	title \
+	buttons
 
 install-exec-hook:
 	rm -f $(DESTDIR)$(libdir)/lxpanel/plugins/*.la
