@@ -31,5 +31,6 @@ GType wb_plugin_get_type(void);
 WBPlugin* wb_plugin_new(void);
 
 void wb_plugin_show_preferences(WBPlugin *self);
+void wb_plugin_update(WBPlugin *self);
 
 #endif /* __BUTTONS_PLUGIN_H__ */

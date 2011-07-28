@@ -13,7 +13,7 @@ void wb_preferences_close_cb(GtkWidget *widget, WBPreferences *self);
 
 G_DEFINE_TYPE(WBPreferences, wb_preferences, GTK_TYPE_WINDOW);
 
-static void wb_preferences_init(WTPreferences *self) {
+static void wb_preferences_init(WBPreferences *self) {
 	GError *err = NULL;
 	self->builder = gtk_builder_new();
 	gtk_builder_add_from_file(self->builder, PATH_UI_PREFS, &err);

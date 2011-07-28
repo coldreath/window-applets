@@ -12,7 +12,7 @@ typedef enum {
 	WB_WIDGET_ANGLE_RIGHT = 270,
 } WBWidgetAngle;
 
-#define WB_TYPE_WIDGET				(wt_widget_get_type())
+#define WB_TYPE_WIDGET				(wb_widget_get_type())
 #define WB_WIDGET(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), WB_TYPE_WIDGET, WBWidget))
 #define WB_IS_WIDGET(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), WB_TYPE_WIDGET))
 #define WB_WIDGET_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), WB_TYPE_WIDGET, WBWidgetClass))
