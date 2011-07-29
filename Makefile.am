@@ -1,10 +1,10 @@
 SUBDIRS = \
-	xfce \
-	lxde \
-	title \
-	buttons
+		title \
+		buttons \
+		${WIBUTI_PANEL_NAME}
 
+if WIBUTI_ENABLE_LXDE
 install-exec-hook:
-	rm -f $(DESTDIR)$(libdir)/lxpanel/plugins/*.la
-	rm -f $(DESTDIR)$(libdir)/lxpanel/plugins/*.a
-
+	rm -f ${DESTDIR}${libdir}/lxpanel/plugins/*.la
+	rm -f ${DESTDIR}${libdir}/lxpanel/plugins/*.a
+endif
