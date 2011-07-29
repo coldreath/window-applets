@@ -1,27 +1,37 @@
 #include <glib/gstdio.h>
 #include <gtk/gtk.h>
 
-#include <title/title-preferences.h>
+#include "applets/preferences.h"
 
-#define PATH_MAIN		"/usr/share/windowtitle"
-#define PATH_UI_PREFS	PATH_MAIN"/title-preferences.ui"
+#define PATH_MAIN			"/usr/share/windowapplets"
+#define PATH_TITLE_UI		PATH_MAIN"/title-preferences.ui"
+#define PATH_BUTTONS_UI		PATH_MAIN"/buttons-preferences.ui"
 
 // callbacks
-gboolean wt_preferences_delete_cb(GtkWidget *widget, GdkEvent *event, WTPreferences *self);
-void wt_preferences_close_cb(GtkWidget *widget, WTPreferences *self);
+static gboolean wibuti_prefs_delete_cb(GtkWidget *widget, GdkEvent *event, WibutiPrefs *self);
+static void wibuti_prefs_close_cb(GtkWidget *widget, WibutiPrefs *self);
 
 
-G_DEFINE_TYPE(WTPreferences, wt_preferences, GTK_TYPE_WINDOW);
+G_DEFINE_TYPE(WibutiPrefs, wibuti_prefs, GTK_TYPE_WINDOW);
 
-static void wt_preferences_init(WTPreferences *self) {
+static void wibuti_prefs_init(WibutiPrefs *self) {
 	GError *err = NULL;
 	self->builder = gtk_builder_new();
-	gtk_builder_add_from_file(self->builder, PATH_UI_PREFS, &err);
+#ifdef WIBUTI_WITH_BUTTONS
+	gtk_builder_add_from_file(self->builder, PATH_BUTTONS_UI, &err);
+#endif // WIBUTI_WITH_BUTTONS
+#ifdef WIBUTI_WITH_TITLE
+	gtk_builder_add_from_file(self->builder, PATH_TITLE_UI, &err);
+#endif // WIBUTI_WITH_TITLE
 	
 	if (err != NULL) {
 		g_fprintf(stderr, "%s\n", err->message);
 		g_error_free(err);
 	} else {
+#ifdef WIBUTI_WITH_BUTTONS
+
+#endif // WIBUTI_WITH_BUTTONS
+#ifdef WIBUTI_WITH_TITLE
 		self->main_box = GTK_BOX(gtk_builder_get_object(self->builder, "main_box"));
 		self->btn_close = GTK_BUTTON(gtk_builder_get_object(self->builder, "btn_close"));
 		
@@ -38,26 +48,36 @@ static void wt_preferences_init(WTPreferences *self) {
 		self->btn_color_inactive = GTK_COLOR_BUTTON(gtk_builder_get_object(self->builder, "btn_color_inactive"));
 
 		self->scale_alignment = GTK_SCALE(gtk_builder_get_object(self->builder, "scale_alignment"));
-		
-		g_signal_connect(self, "delete-event", G_CALLBACK(wt_preferences_delete_cb), self);
-		g_signal_connect(self->btn_close, "clicked", G_CALLBACK(wt_preferences_close_cb), self);
+#endif // WIBUTI_WITH_TITLE
 		
 		gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->main_box));
+
+		g_signal_connect(self->btn_close, "clicked", G_CALLBACK(wibuti_prefs_close_cb), self);
 	}
 	
+	g_signal_connect(self, "delete-event", G_CALLBACK(wibuti_prefs_delete_cb), self);
+
 	g_object_set(GTK_WINDOW(self), "window-position", GTK_WIN_POS_CENTER_ALWAYS, NULL);
 	g_object_set(GTK_WINDOW(self), "border-width", 3, NULL);
-	g_object_set(GTK_WINDOW(self), "title", "Window Title Plugin Preferences", NULL);
+	g_object_set(GTK_WINDOW(self), "title", "Window Applets Preferences", NULL);
 }
 
-static void wt_preferences_class_init(WTPreferencesClass *klass) {
+static void wibuti_prefs_class_init(WibutiPrefsClass *klass) {
 }
 
-WTPreferences* wt_preferences_new(void) {
-	return WT_PREFERENCES(g_object_new(WT_TYPE_PREFERENCES, NULL));
+WibutiPrefs* wibuti_prefs_new(void) {
+	return WIBUTI_PREFS(g_object_new(WIBUTI_TYPE_PREFS, NULL));
 }
 
-void wt_preferences_set_from_config(WTPreferences *self, WTConfig *config) {
+
+/**********************************************************************************************************************/
+
+
+void wibuti_prefs_set_from_config(WibutiPrefs *self, WibutiConfig *config) {
+#ifdef WIBUTI_WITH_BUTTONS
+
+#endif // WIBUTI_WITH_BUTTONS
+#ifdef WIBUTI_WITH_TITLE
 	gtk_toggle_button_set_active(self->chkb_only_maximized, config->only_maximized);
 	gtk_toggle_button_set_active(self->chkb_expand_title, config->expand_title);
 	gtk_toggle_button_set_active(self->chkb_swap_order, config->swap_order);
@@ -74,18 +94,19 @@ void wt_preferences_set_from_config(WTPreferences *self, WTConfig *config) {
 	gtk_font_button_set_font_name(self->btn_font_inactive, config->title_inactive_font);
 	
 	gtk_range_set_value(GTK_RANGE(self->scale_alignment), config->alignment);
+#endif // WIBUTI_WITH_TITLE
 }
 
 
 /**********************************************************************************************************************/
 
 
-gboolean wt_preferences_delete_cb(GtkWidget *widget, GdkEvent *event, WTPreferences *self) {
-	gtk_widget_hide(GTK_WIDGET(&self->parent));
+static gboolean wibuti_prefs_delete_cb(GtkWidget *widget, GdkEvent *event, WibutiPrefs *self) {
+	gtk_widget_hide(GTK_WIDGET(self));
 	return TRUE;
 }
 
-void wt_preferences_close_cb(GtkWidget *widget, WTPreferences *self) {
-	gtk_widget_hide(GTK_WIDGET(&self->parent));
+static void wibuti_prefs_close_cb(GtkWidget *widget, WibutiPrefs *self) {
+	gtk_widget_hide(GTK_WIDGET(self));
 }
 

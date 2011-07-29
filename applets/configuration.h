@@ -1,7 +1,9 @@
-#ifndef __TITLE_CONFIG_H__
-#define __TITLE_CONFIG_H__
+#ifndef __WIBUTI_CONFIG_H__
+#define __WIBUTI_CONFIG_H__
 
 #include <glib.h>
+
+#include "config.h"
 
 #define CFG_ONLY_MAXIMIZED				"only_maximized"
 #define CFG_HIDE_ON_UNMAXIMIZED 		"hide_on_unmaximized"
@@ -18,8 +20,13 @@
 #define CFG_ALIGNMENT					"alignment"
 
 typedef struct {
-	gboolean	only_maximized,			// [T/F] Only track maximized windows
-				hide_on_unmaximized,	// [T/F] Hide when no maximized windows present
+	gboolean	only_maximized;			// [T/F] Only track maximized windows
+
+#ifdef WIBUTI_WITH_BUTTONS
+
+#endif // WIBUTI_WITH_BUTTONS
+#ifdef WIBUTI_WITH_TITLE
+	gboolean	hide_on_unmaximized,	// [T/F] Hide when no maximized windows present
 				hide_icon,				// [T/F] Hide the icon
 				hide_title,				// [T/F] Hide the title
 				swap_order,				// [T/F] Swap title/icon
@@ -31,14 +38,15 @@ typedef struct {
 	gchar		*title_inactive_font;	// Custom inactive title font
 	gchar		*title_inactive_color;	// Custom inactive title color
 	gdouble		alignment;				// Title alignment [0=left, 0.5=center, 1=right]
-} WTConfig;
+#endif // WIBUTI_WITH_TITLE
+} WibutiConfig;
 
-void wt_config_load_defaults(WTConfig *self);
+void wibuti_config_load_defaults(WibutiConfig *self);
 
-void wt_config_load_plain(WTConfig *self);
-void wt_config_save_plain(WTConfig *self);
+void wibuti_config_load_plain(WibutiConfig *self);
+void wibuti_config_save_plain(WibutiConfig *self);
 // TODO
-//void wt_config_load_gconf(WTConfig *self);
-//void wt_config_save_gconf(WTConfig *self);
+//void wibuti_config_load_gconf(WibutiConfig *self);
+//void wibuti_config_save_gconf(WibutiConfig *self);
 
-#endif /* __TITLE_CONFIG_H__ */
+#endif // __WIBUTI_CONFIG_H__

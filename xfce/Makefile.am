@@ -1,46 +1,44 @@
-AM_CPPFLAGS = $(XFCE_PANEL_CFLAGS) $(WNCK_CFLAGS) -I$(srcdir)/.. -Wall
+AM_CPPFLAGS = -I${top_srcdir} -Wall
 
-xfcelibexecdir = $(prefix)/libexec/xfce4/panel-plugins/
-xfcelibexec_PROGRAMS = \
-	xfce4-windowtitle-plugin \
-	xfce4-windowbuttons-plugin
+WIBUTI_SRC = \
+		${top_srcdir}/config.h \
+		${top_srcdir}/xfce/applet-xfce4-main.c \
+		${top_srcdir}/applets/widget.c \
+		${top_srcdir}/applets/widget.h \
+		${top_srcdir}/applets/plugin.c \
+		${top_srcdir}/applets/plugin.h \
+		${top_srcdir}/applets/preferences.c \
+		${top_srcdir}/applets/preferences.h \
+		${top_srcdir}/applets/configuration.c \
+		${top_srcdir}/applets/configuration.h \
+		${top_srcdir}/common/watcher.c \
+		${top_srcdir}/common/watcher.h \
+		${top_srcdir}/common/tools.c \
+		${top_srcdir}/common/tools.h
 
-xfce4_windowtitle_plugin_LDADD = $(XFCE_PANEL_LIBS) $(WNCK_LIBS)
-xfce4_windowtitle_plugin_SOURCES = \
-	$(top_srcdir)/xfce/xfce4-windowtitle-main.c \
-	$(top_srcdir)/xfce/xfce4-title-plugin.c \
-	$(top_srcdir)/xfce/xfce4-title-plugin.h \
-	$(top_srcdir)/title/title-widget.c \
-	$(top_srcdir)/title/title-widget.h \
-	$(top_srcdir)/title/title-plugin.c \
-	$(top_srcdir)/title/title-plugin.h \
-	$(top_srcdir)/title/title-preferences.c \
-	$(top_srcdir)/title/title-preferences.h \
-	$(top_srcdir)/title/title-config.c \
-	$(top_srcdir)/title/title-config.h \
-	$(top_srcdir)/common/watcher.c \
-	$(top_srcdir)/common/watcher.h \
-	$(top_srcdir)/common/tools.c \
-	$(top_srcdir)/common/tools.h
+xfcelibexecdir = ${prefix}/libexec/xfce4/panel-plugins/
+desktopfiledir = ${prefix}/share/xfce4/panel-plugins
 
-xfce4_windowbuttons_plugin_LDADD = $(XFCE_PANEL_LIBS) $(WNCK_LIBS)
-xfce4_windowbuttons_plugin_SOURCES = \
-	$(top_srcdir)/xfce/xfce4-windowbuttons-main.c \
-	$(top_srcdir)/xfce/xfce4-buttons-plugin.c \
-	$(top_srcdir)/xfce/xfce4-buttons-plugin.h \
-	$(top_srcdir)/buttons/buttons-widget.c \
-	$(top_srcdir)/buttons/buttons-widget.h \
-	$(top_srcdir)/buttons/buttons-plugin.c \
-	$(top_srcdir)/buttons/buttons-plugin.h \
-	$(top_srcdir)/buttons/buttons-preferences.c \
-	$(top_srcdir)/buttons/buttons-preferences.h \
-	$(top_srcdir)/buttons/buttons-config.c \
-	$(top_srcdir)/buttons/buttons-config.h \
-	$(top_srcdir)/common/watcher.c \
-	$(top_srcdir)/common/watcher.h \
-	$(top_srcdir)/common/tools.c \
-	$(top_srcdir)/common/tools.h
 
-desktopfiledir = $(prefix)/share/xfce4/panel-plugins
-desktopfile_DATA = xfce4-windowtitle-plugin.desktop xfce4-windowbuttons-plugin.desktop
+xfce4_windowtitle_plugin_CFLAGS = ${XFCE_PANEL_CFLAGS} ${WNCK_CFLAGS}
+xfce4_windowtitle_plugin_LDADD = ${XFCE_PANEL_LIBS} ${WNCK_LIBS}
+xfce4_windowtitle_plugin_SOURCES = ${WIBUTI_SRC}
+
+xfce4_windowbuttons_plugin_CFLAGS = ${XFCE_PANEL_CFLAGS} ${WNCK_CFLAGS}
+xfce4_windowbuttons_plugin_LDADD = ${XFCE_PANEL_LIBS} ${WNCK_LIBS}
+xfce4_windowbuttons_plugin_SOURCES = ${WIBUTI_SRC}
+
+
+xfcelibexec_PROGRAMS = 
+desktopfile_DATA = 
+
+if WIBUTI_WITH_BUTTONS
+xfcelibexec_PROGRAMS += xfce4-windowbuttons-plugin 
+desktopfile_DATA += xfce4-windowbuttons-plugin.desktop
+endif
+
+if WIBUTI_WITH_TITLE
+xfcelibexec_PROGRAMS += xfce4-windowtitle-plugin 
+desktopfile_DATA += xfce4-windowtitle-plugin.desktop
+endif
 

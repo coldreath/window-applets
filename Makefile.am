@@ -1,6 +1,5 @@
 SUBDIRS = \
-		title \
-		buttons \
+		share \
 		${WIBUTI_PANEL_NAME}
 
 if WIBUTI_ENABLE_LXDE
