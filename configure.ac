@@ -9,6 +9,8 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
 
+
+# CHECK THE PANEL
 AC_MSG_CHECKING([for the panel we're compiling for])
 AC_ARG_ENABLE(
 	[panel],
@@ -26,6 +28,7 @@ AM_CONDITIONAL([WIBUTI_ENABLE_XFCE], [test "$panel" = "xfce"])
 AM_CONDITIONAL([WIBUTI_ENABLE_LXDE], [test "$panel" = "lxde"])
 
 
+# CHECK IF WE COMPILE BUTTONS
 AC_MSG_CHECKING([if we compile buttons])
 AC_ARG_WITH(
 	[buttons],
@@ -45,6 +48,7 @@ then
 fi
 
 
+# CHECK IF WE COMPILE TITLE
 AC_MSG_CHECKING([if we compile title])
 AC_ARG_WITH(
 	[title],
@@ -64,13 +68,14 @@ then
 fi
 
 
+# ASSURE IF WE COMPILE ANYTHING
 if test "$title" = "false" && test "$buttons" = "false"
 then
 	AC_MSG_ERROR([you have to specify the applet with --with-title=yes or --with-buttons=yes])
 fi
 
 
-# Check for avaible modules
+# CHECK FOR AVAIBLE MODULES
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTK], [gtk+-2.0])
 PKG_CHECK_MODULES([WNCK], [libwnck-1.0])
@@ -78,6 +83,18 @@ case "$panel" in
 	xfce) PKG_CHECK_MODULES([XFCE_PANEL], [libxfce4panel-1.0]) ;;
 	lxde) PKG_CHECK_MODULES([LXDE_PANEL], [lxpanel]) ;;
 esac
+
+
+# SAVE DIRECTORIES TO MAKEFILES AND CONFIG.H
+WIBUTI_PATH_CONF=${prefix}/share/windowapplets
+WIBUTI_PATH_GENERAL_UI="\"${WIBUTI_PATH_CONF}/general-preferences.ui\""
+WIBUTI_PATH_BUTTONS_UI="\"${WIBUTI_PATH_CONF}/buttons-preferences.ui\""
+WIBUTI_PATH_TITLE_UI="\"${WIBUTI_PATH_CONF}/title-preferences.ui\""
+WIBUTI_PATH_THEMES="\"${WIBUTI_PATH_CONF}/themes\""
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_GENERAL_UI], [${WIBUTI_PATH_GENERAL_UI}], [General builder file])
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_BUTTONS_UI], [${WIBUTI_PATH_BUTTONS_UI}], [Builder file for buttons])
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_TITLE_UI],   [${WIBUTI_PATH_TITLE_UI}],   [Builder file for title])
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_THEMES],     [${WIBUTI_PATH_THEMES}],     [Builder file for themes])
 
 
 AC_CONFIG_FILES([Makefile

@@ -1,9 +1,9 @@
+builderdir = ${WIBUTI_PATH_CONF}
 pixmapsdir = ${datadir}/pixmaps
-builderdir = ${datadir}/windowapplets
 themesdir = ${datadir}/windowapplets/themes
 
 pixmaps_DATA = 
-builder_DATA = 
+builder_DATA = general-preferences.ui
 
 if WIBUTI_WITH_BUTTONS
 pixmaps_DATA += windowbuttons.png

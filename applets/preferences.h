@@ -15,24 +15,29 @@
 typedef struct {
 	GtkWindow parent;
 
-	GtkBuilder *builder;
-	GtkBox  *main_box;
-	GtkButton *btn_close;
+	GtkBuilder   *builder;
+	GtkBox       *main_box;
+	GtkNotebook  *notebook;
+	GtkButtonBox *btnbox;
+	GtkButton    *btn_close;
 
+	// settings
+	GtkButton       *btn_reload_layout;
+	GtkEntry        *entry_layout;
 	GtkToggleButton *chkb_only_maximized;
 
 #ifdef WIBUTI_WITH_BUTTONS
-
+	GtkComboBox     *combo_theme; 
+	GtkToggleButton *chkb_hover_effect;
+	GtkToggleButton *chkb_click_effect;
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
-	GtkToggleButton *chkb_swap_order;
 	GtkToggleButton *chkb_expand_title;
-	GtkToggleButton *chkb_hide_icon;
-	GtkToggleButton *chkb_hide_title;
 	GtkToggleButton *chkb_custom_style;
 	
-	GtkFontButton *btn_font_active;
-	GtkFontButton *btn_font_inactive;
+	GtkFontButton  *btn_font_active;
+	GtkFontButton  *btn_font_inactive;
 	GtkColorButton *btn_color_active;
 	GtkColorButton *btn_color_inactive;
 
