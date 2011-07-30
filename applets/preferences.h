@@ -3,7 +3,7 @@
 
 #include <gtk/gtk.h>
 
-#include <applets/configuration.h>
+#include "applets/configuration.h"
 
 #define WIBUTI_TYPE_PREFS				(wibuti_prefs_get_type())
 #define WIBUTI_PREFS(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), WIBUTI_TYPE_PREFS, WibutiPrefs))

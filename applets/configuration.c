@@ -1,10 +1,13 @@
+#include <string.h>
 #include <glib/gstdio.h>
 
 #include "applets/configuration.h"
-#include "common/tools.h"
 
 #define FILE_BUTTONS_CONFIG	"/.config/windowbuttons.conf"
 #define FILE_TITLE_CONFIG	"/.config/windowtitle.conf"
+
+static gchar* wibuti_config_get_value(FILE *f, gchar *key);
+
 
 void wibuti_config_load_defaults(WibutiConfig *self) {
 	self->only_maximized = TRUE;
@@ -33,19 +36,19 @@ void wibuti_config_load_plain(WibutiConfig *self) {
 	FILE *cfg = g_fopen(g_strconcat(g_get_home_dir(), FILE_TITLE_CONFIG, NULL), "r");
 
 	if (cfg) {
-		self->only_maximized = g_ascii_strtod(get_cfg_value(cfg, CFG_ONLY_MAXIMIZED), NULL);
-		self->hide_on_unmaximized = g_ascii_strtod(get_cfg_value(cfg, CFG_HIDE_ON_UNMAXIMIZED), NULL);
-		self->hide_icon = g_ascii_strtod(get_cfg_value(cfg, CFG_HIDE_ICON), NULL);
-		self->hide_title = g_ascii_strtod(get_cfg_value(cfg, CFG_HIDE_TITLE), NULL);
-		self->alignment = g_ascii_strtod(get_cfg_value(cfg, CFG_ALIGNMENT), NULL);
-		self->swap_order = g_ascii_strtod(get_cfg_value(cfg, CFG_SWAP_ORDER), NULL);
-		self->expand_title = g_ascii_strtod(get_cfg_value(cfg, CFG_EXPAND_TITLE), NULL);
-		self->custom_style = g_ascii_strtod(get_cfg_value(cfg, CFG_CUSTOM_STYLE), NULL);
-		self->show_window_menu = g_ascii_strtod(get_cfg_value(cfg, CFG_SHOW_WINDOW_MENU), NULL);
-		self->title_active_font = get_cfg_value(cfg, CFG_TITLE_ACTIVE_FONT);
-		self->title_active_color = get_cfg_value(cfg, CFG_TITLE_ACTIVE_COLOR_FG);
-		self->title_inactive_font = get_cfg_value(cfg, CFG_TITLE_INACTIVE_FONT);
-		self->title_inactive_color = get_cfg_value(cfg, CFG_TITLE_INACTIVE_COLOR_FG);
+		self->only_maximized = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_ONLY_MAXIMIZED), NULL);
+		self->hide_on_unmaximized = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_HIDE_ON_UNMAXIMIZED), NULL);
+		self->hide_icon = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_HIDE_ICON), NULL);
+		self->hide_title = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_HIDE_TITLE), NULL);
+		self->alignment = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_ALIGNMENT), NULL);
+		self->swap_order = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_SWAP_ORDER), NULL);
+		self->expand_title = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_EXPAND_TITLE), NULL);
+		self->custom_style = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_CUSTOM_STYLE), NULL);
+		self->show_window_menu = g_ascii_strtod(wibuti_config_get_value(cfg, CFG_SHOW_WINDOW_MENU), NULL);
+		self->title_active_font = wibuti_config_get_value(cfg, CFG_TITLE_ACTIVE_FONT);
+		self->title_active_color = wibuti_config_get_value(cfg, CFG_TITLE_ACTIVE_COLOR_FG);
+		self->title_inactive_font = wibuti_config_get_value(cfg, CFG_TITLE_INACTIVE_FONT);
+		self->title_inactive_color = wibuti_config_get_value(cfg, CFG_TITLE_INACTIVE_COLOR_FG);
 		
 		fclose(cfg);
 	}
@@ -78,4 +81,24 @@ void wibuti_config_save_plain(WibutiConfig *self) {
 	}
 #endif // WIBUTI_WITH_TITLE
 }
+
+/* 
+ * Returns a string value of the specified configuration parameter (key)
+ */
+static gchar* wibuti_config_get_value(FILE *f, gchar *key) {
+    gchar tmp[256] = {0x0};
+	long int pos = ftell(f);
+	
+    while (f != NULL && fgets(tmp, sizeof(tmp), f) != NULL) {
+		if (g_strrstr(tmp, key))
+		    break;
+    }
+
+	gchar *r = g_strndup(tmp + strlen(key) + 1, strlen(tmp) - strlen(key) + 1);
+	g_strstrip(r);
+
+	fseek(f, pos, SEEK_SET);
+    return r;
+}
+
 

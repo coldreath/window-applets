@@ -3,7 +3,7 @@
 
 #include <gtk/gtk.h>
 
-#include <applets/configuration.h>
+#include "applets/configuration.h"
 
 typedef enum {
 	WIBUTI_WIDGET_ANGLE_UP = 0,

@@ -11,10 +11,8 @@ WIBUTI_SRC = \
 		${top_srcdir}/applets/preferences.h \
 		${top_srcdir}/applets/configuration.c \
 		${top_srcdir}/applets/configuration.h \
-		${top_srcdir}/common/watcher.c \
-		${top_srcdir}/common/watcher.h \
-		${top_srcdir}/common/tools.c \
-		${top_srcdir}/common/tools.h
+		${top_srcdir}/applets/watcher.c \
+		${top_srcdir}/applets/watcher.h 
 
 xfcelibexecdir = ${prefix}/libexec/xfce4/panel-plugins/
 desktopfiledir = ${prefix}/share/xfce4/panel-plugins

@@ -6,15 +6,15 @@
 static void wibuti_plugin_init(WibutiPlugin *self);
 
 // calbacks
-static void wibuti_plugin_update_cb(Watcher *watcher, WibutiPlugin *self);
+static void wibuti_plugin_update_cb(WibutiWatcher *watcher, WibutiPlugin *self);
 static void wibuti_plugin_maximized_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
 
 #ifdef WIBUTI_WITH_BUTTONS
 
 #endif // WIBUTI_WITH_BUTTONS
 #ifdef WIBUTI_WITH_TITLE
-static void wibuti_plugin_update_title_cb(Watcher *watcher, WibutiPlugin *self);
-static void wibuti_plugin_update_icon_cb(Watcher *watcher, WibutiPlugin *self);
+static void wibuti_plugin_update_title_cb(WibutiWatcher *watcher, WibutiPlugin *self);
+static void wibuti_plugin_update_icon_cb(WibutiWatcher *watcher, WibutiPlugin *self);
 
 static void wibuti_plugin_alignment_changed_cb(GtkScale *scale, WibutiPlugin *self);
 static void wibuti_plugin_expand_title_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
@@ -54,10 +54,10 @@ GType wibuti_plugin_get_type(void) {
 static void wibuti_plugin_init(WibutiPlugin *self) {
 	self->widget = wibuti_widget_new();
 	self->prefs = wibuti_prefs_new();
-	self->watcher = watcher_new();
+	self->watcher = wibuti_watcher_new();
 
 	wibuti_config_load_defaults(&self->config);
-	watcher_set_only_maximized(self->watcher, self->config.only_maximized);
+	wibuti_watcher_set_only_maximized(self->watcher, self->config.only_maximized);
 	
 	// connect to windows signals
 	g_signal_connect(G_OBJECT(self->watcher), "window-changed",
@@ -131,7 +131,7 @@ void wibuti_plugin_update(WibutiPlugin *self) {
 	wibuti_widget_hide_icon(self->widget, self->config.hide_icon);
 	wibuti_widget_hide_title(self->widget, self->config.hide_title);
 
-	watcher_set_only_maximized(self->watcher, self->config.only_maximized);
+	wibuti_watcher_set_only_maximized(self->watcher, self->config.only_maximized);
 
 	wibuti_plugin_update_title(self);
 	wibuti_plugin_update_icon(self);
@@ -142,21 +142,25 @@ void wibuti_plugin_update(WibutiPlugin *self) {
 #endif // WIBUTI_WITH_BUTTONS
 #ifdef WIBUTI_WITH_TITLE
 void wibuti_plugin_update_title(WibutiPlugin *self) {
-	gboolean is_active = watcher_is_active(self->watcher);
+	gboolean is_active = wibuti_watcher_is_active(self->watcher);
 	if (self->config.custom_style) {
 		wibuti_widget_set_title_with_markup(
 					self->widget,
-					watcher_get_title(self->watcher),
+					wibuti_watcher_get_title(self->watcher),
 					is_active ? self->config.title_active_font : self->config.title_inactive_font,
 					is_active ? self->config.title_active_color : self->config.title_inactive_color
 				);
 	} else {
-		wibuti_widget_set_title(self->widget, watcher_get_title(self->watcher), is_active);
+		wibuti_widget_set_title(self->widget, wibuti_watcher_get_title(self->watcher), is_active);
 	}
 }
 
 void wibuti_plugin_update_icon(WibutiPlugin *self) {
-	wibuti_widget_set_icon(self->widget, watcher_get_icon(self->watcher), watcher_is_active(self->watcher));
+	wibuti_widget_set_icon(
+				self->widget, 
+				wibuti_watcher_get_icon(self->watcher), 
+				wibuti_watcher_is_active(self->watcher)
+			);
 }
 #endif // WIBUTI_WITH_TITLE
 
@@ -164,7 +168,7 @@ void wibuti_plugin_update_icon(WibutiPlugin *self) {
 /**********************************************************************************************************************/
 
 
-static void wibuti_plugin_update_cb(Watcher *watcher, WibutiPlugin *self) {
+static void wibuti_plugin_update_cb(WibutiWatcher *watcher, WibutiPlugin *self) {
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
 #ifdef WIBUTI_WITH_TITLE
@@ -176,7 +180,7 @@ static void wibuti_plugin_update_cb(Watcher *watcher, WibutiPlugin *self) {
 static void wibuti_plugin_maximized_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self) {
 	gboolean active = gtk_toggle_button_get_active(btn);
 	self->config.only_maximized = active;
-	watcher_set_only_maximized(self->watcher, active);
+	wibuti_watcher_set_only_maximized(self->watcher, active);
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
 #ifdef WIBUTI_WITH_TITLE
@@ -189,11 +193,11 @@ static void wibuti_plugin_maximized_toggled_cb(GtkToggleButton *btn, WibutiPlugi
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
 #ifdef WIBUTI_WITH_TITLE
-static void wibuti_plugin_update_title_cb(Watcher *watcher, WibutiPlugin *self) {
+static void wibuti_plugin_update_title_cb(WibutiWatcher *watcher, WibutiPlugin *self) {
 	wibuti_plugin_update_title(self);
 }
 
-static void wibuti_plugin_update_icon_cb(Watcher *watcher, WibutiPlugin *self) {
+static void wibuti_plugin_update_icon_cb(WibutiWatcher *watcher, WibutiPlugin *self) {
 	wibuti_plugin_update_icon(self);
 }
 

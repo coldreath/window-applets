@@ -5,7 +5,7 @@
 
 #include <applets/preferences.h>
 #include <applets/widget.h>
-#include <common/watcher.h>
+#include <applets/watcher.h>
 
 #define WIBUTI_TYPE_PLUGIN				(wibuti_plugin_get_type ())
 #define WIBUTI_PLUGIN(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), WIBUTI_TYPE_PLUGIN, WibutiPlugin))
@@ -20,7 +20,7 @@ typedef struct {
 	WibutiWidget *widget;
 	WibutiPrefs *prefs;
 	WibutiConfig config;
-	Watcher *watcher;
+	WibutiWatcher *watcher;
 } WibutiPlugin;
 
 typedef struct {
