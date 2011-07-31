@@ -35,7 +35,7 @@
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkCheckButton" id="rotate_icon">
-                        <property name="label" translatable="yes">Rotate _icon</property>
+                        <property name="label" translatable="yes">Rotate _icon with panel</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>

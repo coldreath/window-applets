@@ -34,8 +34,8 @@ void wibuti_plugin_show_preferences(WibutiPlugin *self);
 void wibuti_plugin_update(WibutiPlugin *self);
 
 #ifdef WIBUTI_WITH_BUTTONS
-
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 void wibuti_plugin_update_title(WibutiPlugin *self);
 void wibuti_plugin_update_icon(WibutiPlugin *self);

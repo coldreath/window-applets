@@ -15,6 +15,7 @@ static gchar* wibuti_config_get_value(FILE *f, gchar *key);
 void wibuti_config_load_defaults(WibutiConfig *self) {
 	self->only_maximized = TRUE;
 	self->hide_on_unmaximized = FALSE;
+	self->layout = "ITMRX";
 
 #ifdef WIBUTI_WITH_BUTTONS
 	self->click_effect = FALSE;

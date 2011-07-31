@@ -59,7 +59,7 @@ GType wibuti_widget_get_type(void);
 WibutiWidget* wibuti_widget_new(void);
 
 void wibuti_widget_change_angle(WibutiWidget *self, WibutiWidgetAngle angle);
-void wibuti_widget_repack_with_string(WibutiWidget *self, gchar *string);
+void wibuti_widget_repack_with_string(WibutiWidget *self, const gchar *string);
 
 #ifdef WIBUTI_WITH_BUTTONS
 void wibuti_widget_change_theme(WibutiWidget *self, GdkPixbuf ***pixbufs);
@@ -67,12 +67,10 @@ void wibuti_widget_change_theme(WibutiWidget *self, GdkPixbuf ***pixbufs);
 
 #ifdef WIBUTI_WITH_TITLE
 void wibuti_widget_set_title(WibutiWidget *self, const gchar *title, gboolean is_active);
-void wibuti_widget_set_title_with_markup(WibutiWidget *self, const gchar *title, const gchar *font, const gchar *color);
+void wibuti_widget_set_markup_title(WibutiWidget *self, const gchar *title, const gchar *font, const gchar *color);
 void wibuti_widget_set_expand_title(WibutiWidget *self, gboolean expand);
 void wibuti_widget_set_icon(WibutiWidget *self, GdkPixbuf *icon, gboolean is_active);
 void wibuti_widget_set_alignment(WibutiWidget *self, gdouble value);
-//void wibuti_widget_hide_title(WibutiWidget *self, gboolean hide);
-//void wibuti_widget_hide_icon(WibutiWidget *self, gboolean hide);
 #endif // WIBUTI_WITH_TITLE
 
 #endif // __WIBUTI_WIDGET_H__

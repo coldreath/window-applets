@@ -16,8 +16,9 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 	char *markup = "";
 	
 	self->builder = gtk_builder_new();
+	self->main_box = GTK_BOX(gtk_vbox_new(FALSE, 5));
 	self->notebook = GTK_NOTEBOOK(gtk_notebook_new());
-	self->btn_close = GTK_BUTTON(gtk_button_new());
+	self->btn_close = GTK_BUTTON(gtk_button_new_from_stock(GTK_STOCK_CLOSE));
 	self->btnbox = GTK_BUTTON_BOX(gtk_hbutton_box_new());
 	label_layout_tip = GTK_LABEL(gtk_label_new(""));
 
@@ -98,9 +99,9 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 		alignment_general = GTK_ALIGNMENT(gtk_builder_get_object(self->builder, "alignment_general"));
 		label_layout_tip = GTK_LABEL(gtk_builder_get_object(self->builder, "label_layout_tip"));
 
+		self->chkb_only_maximized = GTK_TOGGLE_BUTTON(gtk_builder_get_object(self->builder, CFG_ONLY_MAXIMIZED));
 		self->btn_reload_layout = GTK_BUTTON(gtk_builder_get_object(self->builder, "btn_reload_layout"));
 		self->entry_layout = GTK_ENTRY(gtk_builder_get_object(self->builder, "entry_layout"));
-		self->chkb_only_maximized = GTK_TOGGLE_BUTTON(gtk_builder_get_object(self->builder, CFG_ONLY_MAXIMIZED));
 		
 		// pack to notebook
 		label_general = GTK_LABEL(gtk_label_new("General"));
@@ -115,12 +116,11 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 
 	g_object_set(GTK_WINDOW(self), "window-position", GTK_WIN_POS_CENTER_ALWAYS, NULL);
 	g_object_set(GTK_WINDOW(self), "border-width", 3, NULL);
-	g_object_set(GTK_WINDOW(self), "title", "Window Applets Preferences", NULL);
 
 	// pack gui
 	gtk_box_pack_start(GTK_BOX(self->btnbox), GTK_WIDGET(self->btn_close), FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(self), GTK_WIDGET(self->notebook), TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(self), GTK_WIDGET(self->btnbox), FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(self->main_box), GTK_WIDGET(self->notebook), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(self->main_box), GTK_WIDGET(self->btnbox), FALSE, TRUE, 0);
 	gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->main_box));
 
 	// connect signals
@@ -141,16 +141,16 @@ WibutiPrefs* wibuti_prefs_new(void) {
 
 void wibuti_prefs_set_from_config(WibutiPrefs *self, WibutiConfig *config) {
 	gtk_toggle_button_set_active(self->chkb_only_maximized, config->only_maximized);
+	gtk_entry_set_text(self->entry_layout, config->layout);
 
 #ifdef WIBUTI_WITH_BUTTONS
-
+	gtk_toggle_button_set_active(self->chkb_click_effect, config->click_effect);
+	gtk_toggle_button_set_active(self->chkb_hover_effect, config->hover_effect);
+	//TODO: combo
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
 	gtk_toggle_button_set_active(self->chkb_expand_title, config->expand_title);
-	gtk_toggle_button_set_active(self->chkb_swap_order, config->swap_order);
-	gtk_toggle_button_set_active(self->chkb_hide_title, config->hide_title);
-	gtk_toggle_button_set_active(self->chkb_hide_icon, config->hide_icon);
 	gtk_toggle_button_set_active(self->chkb_custom_style, config->custom_style);
 	
 	GdkColor color;

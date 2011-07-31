@@ -24,7 +24,7 @@
 typedef struct {
 	gboolean  only_maximized;		// [T/F] Only track maximized windows
 	gboolean  hide_on_unmaximized;	// [T/F] Hide when no maximized windows present
-	gchar    *layout;
+	const gchar *layout;
 
 #ifdef WIBUTI_WITH_BUTTONS
 	gboolean  click_effect,

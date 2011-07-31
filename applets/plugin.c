@@ -8,19 +8,17 @@ static void wibuti_plugin_init(WibutiPlugin *self);
 // calbacks
 static void wibuti_plugin_update_cb(WibutiWatcher *watcher, WibutiPlugin *self);
 static void wibuti_plugin_maximized_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
+static void wibuti_plugin_reload_layout_cb(GtkButton *btn, WibutiPlugin *self);
 
 #ifdef WIBUTI_WITH_BUTTONS
-
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 static void wibuti_plugin_update_title_cb(WibutiWatcher *watcher, WibutiPlugin *self);
 static void wibuti_plugin_update_icon_cb(WibutiWatcher *watcher, WibutiPlugin *self);
 
 static void wibuti_plugin_alignment_changed_cb(GtkScale *scale, WibutiPlugin *self);
 static void wibuti_plugin_expand_title_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
-static void wibuti_plugin_swap_order_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
-static void wibuti_plugin_hide_title_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
-static void wibuti_plugin_hide_icon_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
 static void wibuti_plugin_custom_style_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self);
 static void wibuti_plugin_active_font_set_cb(GtkFontButton *btn, WibutiPlugin *self);
 static void wibuti_plugin_inactive_font_set_cb(GtkFontButton *btn, WibutiPlugin *self);
@@ -58,12 +56,15 @@ static void wibuti_plugin_init(WibutiPlugin *self) {
 
 	wibuti_config_load_defaults(&self->config);
 	wibuti_watcher_set_only_maximized(self->watcher, self->config.only_maximized);
-	
+	wibuti_widget_repack_with_string(self->widget, self->config.layout);
+
 	// connect to windows signals
 	g_signal_connect(G_OBJECT(self->watcher), "window-changed",
 	                 G_CALLBACK(wibuti_plugin_update_cb), self);
+	                 
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 	g_signal_connect(G_OBJECT(self->watcher), "name-changed",
 	                 G_CALLBACK(wibuti_plugin_update_title_cb), self);
@@ -87,18 +88,15 @@ void wibuti_plugin_show_preferences(WibutiPlugin *self) {
 		
 		g_signal_connect(G_OBJECT(self->prefs->chkb_only_maximized), "toggled",
 			             G_CALLBACK(wibuti_plugin_maximized_toggled_cb), self);
+		g_signal_connect(G_OBJECT(self->prefs->btn_reload_layout), "clicked",
+		                 G_CALLBACK(wibuti_plugin_reload_layout_cb), self);
 
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 		g_signal_connect(G_OBJECT(self->prefs->chkb_expand_title), "toggled",
 			             G_CALLBACK(wibuti_plugin_expand_title_toggled_cb), self);
-		g_signal_connect(G_OBJECT(self->prefs->chkb_swap_order), "toggled",
-			             G_CALLBACK(wibuti_plugin_swap_order_toggled_cb), self);
-		g_signal_connect(G_OBJECT(self->prefs->chkb_hide_title), "toggled",
-			             G_CALLBACK(wibuti_plugin_hide_title_toggled_cb), self);
-		g_signal_connect(G_OBJECT(self->prefs->chkb_hide_icon), "toggled",
-			             G_CALLBACK(wibuti_plugin_hide_icon_toggled_cb), self);
 		g_signal_connect(G_OBJECT(self->prefs->chkb_custom_style), "toggled",
 			             G_CALLBACK(wibuti_plugin_custom_style_toggled_cb), self);
 	
@@ -122,17 +120,13 @@ void wibuti_plugin_show_preferences(WibutiPlugin *self) {
 }
 
 void wibuti_plugin_update(WibutiPlugin *self) {
-#ifdef WIBUTI_WITH_BUTTONS
-#endif // WIBUTI_WITH_BUTTONS
-#ifdef WIBUTI_WITH_TITLE
-	wibuti_widget_set_alignment(self->widget, self->config.alignment);
-	wibuti_widget_set_packing(self->widget, self->config.swap_order, self->config.expand_title);
-
-	wibuti_widget_hide_icon(self->widget, self->config.hide_icon);
-	wibuti_widget_hide_title(self->widget, self->config.hide_title);
-
 	wibuti_watcher_set_only_maximized(self->watcher, self->config.only_maximized);
 
+#ifdef WIBUTI_WITH_BUTTONS
+#endif // WIBUTI_WITH_BUTTONS
+
+#ifdef WIBUTI_WITH_TITLE
+	wibuti_widget_set_alignment(self->widget, self->config.alignment);
 	wibuti_plugin_update_title(self);
 	wibuti_plugin_update_icon(self);
 #endif // WIBUTI_WITH_TITLE
@@ -140,11 +134,12 @@ void wibuti_plugin_update(WibutiPlugin *self) {
 
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 void wibuti_plugin_update_title(WibutiPlugin *self) {
 	gboolean is_active = wibuti_watcher_is_active(self->watcher);
 	if (self->config.custom_style) {
-		wibuti_widget_set_title_with_markup(
+		wibuti_widget_set_markup_title(
 					self->widget,
 					wibuti_watcher_get_title(self->watcher),
 					is_active ? self->config.title_active_font : self->config.title_inactive_font,
@@ -170,6 +165,7 @@ void wibuti_plugin_update_icon(WibutiPlugin *self) {
 
 static void wibuti_plugin_update_cb(WibutiWatcher *watcher, WibutiPlugin *self) {
 #ifdef WIBUTI_WITH_BUTTONS
+	wibuti_plugin_update_buttons(self);
 #endif // WIBUTI_WITH_BUTTONS
 #ifdef WIBUTI_WITH_TITLE
 	wibuti_plugin_update_title(self);
@@ -181,17 +177,30 @@ static void wibuti_plugin_maximized_toggled_cb(GtkToggleButton *btn, WibutiPlugi
 	gboolean active = gtk_toggle_button_get_active(btn);
 	self->config.only_maximized = active;
 	wibuti_watcher_set_only_maximized(self->watcher, active);
+	
 #ifdef WIBUTI_WITH_BUTTONS
+	wibuti_plugin_update_buttons(self);
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 	wibuti_plugin_update_title(self);
 	wibuti_plugin_update_icon(self);
-	wibuti_config_save_plain(&self->config);
 #endif // WIBUTI_WITH_TITLE
+
+	wibuti_config_save_plain(&self->config);
+}
+
+static void wibuti_plugin_reload_layout_cb(GtkButton *btn, WibutiPlugin *self) {
+printf("#\n");
+	self->config.layout = gtk_entry_get_text(self->prefs->entry_layout);
+	wibuti_widget_repack_with_string(self->widget, self->config.layout);
+	wibuti_config_save_plain(&self->config);
+printf("$\n");
 }
 
 #ifdef WIBUTI_WITH_BUTTONS
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 static void wibuti_plugin_update_title_cb(WibutiWatcher *watcher, WibutiPlugin *self) {
 	wibuti_plugin_update_title(self);
@@ -210,25 +219,7 @@ static void wibuti_plugin_alignment_changed_cb(GtkScale *scale, WibutiPlugin *se
 
 static void wibuti_plugin_expand_title_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self) {
 	self->config.expand_title = gtk_toggle_button_get_active(btn);
-	wibuti_widget_set_packing(self->widget, self->config.swap_order, self->config.expand_title);
-	wibuti_config_save_plain(&self->config);
-}
-
-static void wibuti_plugin_swap_order_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self) {
-	self->config.swap_order = gtk_toggle_button_get_active(btn);
-	wibuti_widget_set_packing(self->widget, self->config.swap_order, self->config.expand_title);
-	wibuti_config_save_plain(&self->config);
-}
-
-static void wibuti_plugin_hide_icon_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self) {
-	self->config.hide_icon = gtk_toggle_button_get_active(btn);
-	wibuti_widget_hide_icon(self->widget, self->config.hide_icon);
-	wibuti_config_save_plain(&self->config);
-}
-
-static void wibuti_plugin_hide_title_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self) {
-	self->config.hide_title = gtk_toggle_button_get_active(btn);
-	wibuti_widget_hide_title(self->widget, self->config.hide_title);
+	wibuti_widget_set_expand_title(self->widget, self->config.expand_title);
 	wibuti_config_save_plain(&self->config);
 }
 

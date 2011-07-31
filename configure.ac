@@ -68,7 +68,7 @@ then
 fi
 
 
-# ASSURE IF WE COMPILE ANYTHING
+# ASSURE WE COMPILE ANYTHING
 if test "$title" = "false" && test "$buttons" = "false"
 then
 	AC_MSG_ERROR([you have to specify the applet with --with-title=yes or --with-buttons=yes])
@@ -85,18 +85,22 @@ case "$panel" in
 esac
 
 
-# SAVE DIRECTORIES TO MAKEFILES AND CONFIG.H
+# MAKE DIRECTORIES AVAIBLE IN MAKEFILES AND CONFIG.H
 WIBUTI_PATH_CONF=${prefix}/share/windowapplets
-WIBUTI_PATH_GENERAL_UI="\"${WIBUTI_PATH_CONF}/general-preferences.ui\""
-WIBUTI_PATH_BUTTONS_UI="\"${WIBUTI_PATH_CONF}/buttons-preferences.ui\""
-WIBUTI_PATH_TITLE_UI="\"${WIBUTI_PATH_CONF}/title-preferences.ui\""
-WIBUTI_PATH_THEMES="\"${WIBUTI_PATH_CONF}/themes\""
-AC_DEFINE_UNQUOTED([WIBUTI_PATH_GENERAL_UI], [${WIBUTI_PATH_GENERAL_UI}], [General builder file])
-AC_DEFINE_UNQUOTED([WIBUTI_PATH_BUTTONS_UI], [${WIBUTI_PATH_BUTTONS_UI}], [Builder file for buttons])
-AC_DEFINE_UNQUOTED([WIBUTI_PATH_TITLE_UI],   [${WIBUTI_PATH_TITLE_UI}],   [Builder file for title])
-AC_DEFINE_UNQUOTED([WIBUTI_PATH_THEMES],     [${WIBUTI_PATH_THEMES}],     [Builder file for themes])
+WIBUTI_PATH_GENERAL_UI="${WIBUTI_PATH_CONF}/general-preferences.ui"
+WIBUTI_PATH_BUTTONS_UI="${WIBUTI_PATH_CONF}/buttons-preferences.ui"
+WIBUTI_PATH_TITLE_UI="${WIBUTI_PATH_CONF}/title-preferences.ui"
+WIBUTI_PATH_THEMES="${WIBUTI_PATH_CONF}/themes"
+
+AC_SUBST([WIBUTI_PATH_CONF], [${WIBUTI_PATH_CONF}])
+
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_GENERAL_UI], ["${WIBUTI_PATH_GENERAL_UI}"], [General builder file])
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_BUTTONS_UI], ["${WIBUTI_PATH_BUTTONS_UI}"], [Builder file for buttons])
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_TITLE_UI],   ["${WIBUTI_PATH_TITLE_UI}"],   [Builder file for title])
+AC_DEFINE_UNQUOTED([WIBUTI_PATH_THEMES],     ["${WIBUTI_PATH_THEMES}"],     [Builder file for themes])
 
 
+# OUTPUT FILES
 AC_CONFIG_FILES([Makefile
                  xfce/Makefile
                  lxde/Makefile

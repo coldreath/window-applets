@@ -1,3 +1,5 @@
+#include <glib/gstdio.h>
+
 #include "applets/widget.h"
 
 #define ICON_WIDTH	16
@@ -19,6 +21,8 @@ static void wibuti_widget_init(WibutiWidget *self) {
 	gtk_container_add(GTK_CONTAINER(self->evbox_minimize), GTK_WIDGET(self->image_minimize));
 	gtk_container_add(GTK_CONTAINER(self->evbox_maximize), GTK_WIDGET(self->image_maximize));
 	gtk_container_add(GTK_CONTAINER(self->evbox_close), GTK_WIDGET(self->image_close));
+	
+	self->use_close = self->use_maximize = self->use_minimize = FALSE;
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
@@ -29,8 +33,11 @@ static void wibuti_widget_init(WibutiWidget *self) {
 	
 	gtk_container_add(GTK_CONTAINER(self->evbox_icon), GTK_WIDGET(self->image_icon));
 	gtk_container_add(GTK_CONTAINER(self->evbox_title), GTK_WIDGET(self->label_title));
+
+	self->use_title = self->use_icon = FALSE;
 #endif // WIBUTI_WITH_TITLE
 
+	gtk_box_pack_start(GTK_BOX(self), GTK_WIDGET(self->box), TRUE, TRUE, 0);
 	wibuti_widget_repack_with_string(self, "");
 }
 
@@ -45,51 +52,99 @@ WibutiWidget* wibuti_widget_new(void) {
 /**********************************************************************************************************************/
 
 
-void wibuti_widget_repack_with_string(WibutiWidget *self, gchar *string) {
+void wibuti_widget_repack_with_string(WibutiWidget *self, const gchar *string) {
+printf("!\n");
 #ifdef WIBUTI_WITH_BUTTONS
-	use_close = use_maximize = use_minimize = FALSE
+
+	g_object_ref(self->evbox_minimize);
+	g_object_ref(self->evbox_maximize);
+	g_object_ref(self->evbox_close);
+
+	if (self->use_minimize) {
+		gtk_container_remove(GTK_CONTAINER(self->box), GTK_WIDGET(self->evbox_minimize));
+	}
+	if (self->use_maximize) {
+		gtk_container_remove(GTK_CONTAINER(self->box), GTK_WIDGET(self->evbox_maximize));
+	}
+	if (self->use_close) {
+		gtk_container_remove(GTK_CONTAINER(self->box), GTK_WIDGET(self->evbox_close));
+	}
+
+	self->use_close = self->use_maximize = self->use_minimize = FALSE;
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
-	use_title = use_icon = FALSE
+printf("1\n");
+	g_object_ref(self->evbox_title);
+printf("2\n");
+	g_object_ref(self->evbox_icon);
+
+printf("3\n");
+	if (self->use_title) {
+		gtk_container_remove(GTK_CONTAINER(self->box), GTK_WIDGET(self->evbox_title));
+	}
+printf("4\n");
+	if (self->use_icon) {
+		gtk_container_remove(GTK_CONTAINER(self->box), GTK_WIDGET(self->evbox_icon));
+	}
+printf("5\n");
+
+	self->use_title = self->use_icon = FALSE;
 #endif // WIBUTI_WITH_TITLE
 
 	gchar c;
 	int i = 0;
-	while (c = string[i]) {
+	while ((c = string[i]) != '\0') {
 		switch (c) {
 #ifdef WIBUTI_WITH_BUTTONS
 			case 'M': {
 				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_minimize), FALSE, FALSE, 0);
-				use_maximize = TRUE;
+				self->use_maximize = TRUE;
 				break;
 			} case 'R': {
 				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_maximize), FALSE, FALSE, 0);
-				use_maximize = TRUE;
+				self->use_maximize = TRUE;
 				break;
 			} case 'X': {
 				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_close), FALSE, FALSE, 0);
-				use_close = TRUE;
+				self->use_close = TRUE;
 				break;
 			}
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
 			case 'T': {
+printf(">>\n");
 				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), FALSE, FALSE, 0);
-				use_title = TRUE;
+printf("<<\n");
+				self->use_title = TRUE;
 				break;
 			} case 'I': {
 				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_icon), FALSE, FALSE, 0);
-				use_icon = TRUE;
+				self->use_icon = TRUE;
 				break;
 			}
 #endif // WIBUTI_WITH_TITLE
 
 			default: {
-				g_fprintf(stderr, "Ignoring variable\n");
+				g_fprintf(stderr, "Ignoring variable %c\n", c);
 			}
 		}
+		++i;
 	}
+	
+#ifdef WIBUTI_WITH_BUTTONS
+	g_object_ref(self->evbox_minimize);
+	g_object_ref(self->evbox_maximize);
+	g_object_ref(self->evbox_close);
+#endif // WIBUTI_WITH_BUTTONS
+
+#ifdef WIBUTI_WITH_TITLE
+	g_object_ref(self->evbox_title);
+	g_object_ref(self->evbox_icon);
+#endif // WIBUTI_WITH_TITLE
+	
+printf("@\n");
 }
 
 void wibuti_widget_change_angle(WibutiWidget *self, WibutiWidgetAngle angle) {
@@ -107,7 +162,7 @@ void wibuti_widget_change_angle(WibutiWidget *self, WibutiWidgetAngle angle) {
 
 #ifdef WIBUTI_WITH_TITLE
 	gtk_label_set_angle(self->label_title, angle);
-	wibuti_widget_set_icon(self, self->image_icon, FALSE));
+	wibuti_widget_set_icon(self, self->icon, FALSE);
 #endif // WIBUTI_WITH_TITLE
 }
 
@@ -131,12 +186,16 @@ void wibuti_widget_set_title(WibutiWidget *self, const gchar *title, gboolean is
 	}
 }
 
-void wibuti_widget_set_title_with_markup(WibutiWidget *self, const gchar *title, const gchar *font, const gchar *color) {
+void wibuti_widget_set_markup_title(WibutiWidget *self, const gchar *title, const gchar *font, const gchar *color) {
 	if (self->use_title) {
 		gchar *title_text = g_markup_printf_escaped("<span font=\"%s\" color=\"%s\">%s</span>", font, color, title);
 		gtk_label_set_markup(GTK_LABEL(self->label_title), title_text);
 		g_free(title_text);
 	}
+}
+
+void wibuti_widget_set_expand_title(WibutiWidget *self, gboolean expand_title) {
+	gtk_box_set_child_packing(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), expand_title, TRUE, 0, GTK_PACK_START);
 }
 
 void wibuti_widget_set_icon(WibutiWidget *self, GdkPixbuf *icon, gboolean is_active) {
@@ -161,28 +220,6 @@ void wibuti_widget_set_icon(WibutiWidget *self, GdkPixbuf *icon, gboolean is_act
 void wibuti_widget_set_alignment(WibutiWidget *self, gdouble value) {
 	gtk_misc_set_alignment(GTK_MISC(self->label_title), value, 0.5);
 }
-
-/*void wibuti_widget_set_packing(WibutiWidget *self, gboolean swap_order, gboolean expand_title) {
-	GtkPackType pack_type = swap_order ? GTK_PACK_END : GTK_PACK_START;
-	gtk_box_set_child_packing(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), expand_title, expand_title, 5, pack_type);
-	gtk_box_set_child_packing(GTK_BOX(self->box), GTK_WIDGET(self->evbox_icon), FALSE, FALSE, 2, pack_type);
-}*/
-
-/*void wibuti_widget_hide_title(WibutiWidget *self, gboolean hide) {
-	if (hide) {
-		gtk_widget_hide(GTK_WIDGET(self->label_title));
-	} else {
-		gtk_widget_show(GTK_WIDGET(self->label_title));
-	}
-}
-
-void wibuti_widget_hide_icon(WibutiWidget *self, gboolean hide) {
-	if (hide) {
-		gtk_widget_hide(GTK_WIDGET(self->image_icon));
-	} else {
-		gtk_widget_show(GTK_WIDGET(self->image_icon));
-	}
-}*/
 
 #endif // WIBUTI_WITH_TITLE
 
