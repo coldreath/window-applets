@@ -3,9 +3,14 @@
 
 #include "applets/preferences.h"
 
+#ifdef WIBUTI_WITH_BUTTONS
+static void wibuti_prefs_set_theme(WibutiPrefs *, WibutiConfig *);
+static void wibuti_prefs_reload_buttons(WibutiPrefs *, GdkPixbuf ****, gboolean);
+#endif // WIBUTI_WITH_BUTTONS
+
 // callbacks
-static gboolean wibuti_prefs_delete_cb(GtkWidget *widget, GdkEvent *event, WibutiPrefs *self);
-static void wibuti_prefs_close_cb(GtkWidget *widget, WibutiPrefs *self);
+static gboolean wibuti_prefs_delete_cb(GtkWidget *, GdkEvent *, WibutiPrefs *);
+static void wibuti_prefs_close_cb(GtkWidget *, WibutiPrefs *);
 
 
 G_DEFINE_TYPE(WibutiPrefs, wibuti_prefs, GTK_TYPE_WINDOW);
@@ -18,14 +23,12 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 	GtkButton *btn_close = GTK_BUTTON(gtk_button_new_from_stock(GTK_STOCK_CLOSE));
 	GtkButtonBox *btnbox = GTK_BUTTON_BOX(gtk_hbutton_box_new());
 	GtkLabel *label_layout_tip = GTK_LABEL(gtk_label_new(""));
-
 	self->builder = gtk_builder_new();
 
 #ifdef WIBUTI_WITH_BUTTONS
 	GtkAlignment *alignment_theme, *alignment_buttons;
 	GtkLabel *label_theme, *label_buttons;
 
-//	self->combo_theme = GTK_COMBO_BOX(gtk_combo_box_text_new());
 	gtk_builder_add_from_file(self->builder, WIBUTI_PATH_BUTTONS_UI, &err);
 
 	if (err != NULL) {
@@ -40,10 +43,17 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 		self->chkb_click_effect = GTK_TOGGLE_BUTTON(gtk_builder_get_object(self->builder, CFG_CLICK_EFFECT));
 
 		// fill themes combo
-		GDir *dir = g_dir_open(WIBUTI_PATH_THEMES, 0, NULL);
+		GtkListStore *list_store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT);
+		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
+		gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(self->combo_theme), renderer, TRUE);
+		gtk_combo_box_set_model(self->combo_theme, GTK_TREE_MODEL(list_store));
+
 		const gchar *subdir;
+		GDir *dir = g_dir_open(WIBUTI_PATH_THEMES, 0, NULL);
 		while ((subdir = g_dir_read_name(dir)) != NULL) {
-//			gtk_combo_box_text_append_text(self->combo_theme, subdir);
+			GtkTreeIter iter;
+			gtk_list_store_append(list_store, &iter);
+			gtk_list_store_set(list_store, &iter, 0, subdir, 1, 0, -1);
 		}
 		g_dir_close(dir);
 
@@ -147,7 +157,7 @@ void wibuti_prefs_set_from_config(WibutiPrefs *self, WibutiConfig *config) {
 #ifdef WIBUTI_WITH_BUTTONS
 	gtk_toggle_button_set_active(self->chkb_click_effect, config->click_effect);
 	gtk_toggle_button_set_active(self->chkb_hover_effect, config->hover_effect);
-	//TODO: combo
+	wibuti_prefs_set_theme(self, config);
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
@@ -165,6 +175,34 @@ void wibuti_prefs_set_from_config(WibutiPrefs *self, WibutiConfig *config) {
 	gtk_range_set_value(GTK_RANGE(self->scale_alignment), config->alignment);
 #endif // WIBUTI_WITH_TITLE
 }
+
+#ifdef WIBUTI_WITH_BUTTONS
+
+static void wibuti_prefs_set_theme(WibutiPrefs *self, WibutiConfig *config) {
+	gchar *name;
+	int local;
+	GtkListStore *list_store = GTK_LIST_STORE(gtk_combo_box_get_model(self->combo_theme));
+	GtkTreeIter *iter = g_new(GtkTreeIter, 1);
+	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(list_store), iter)) {
+		do {
+			gtk_tree_model_get(GTK_TREE_MODEL(list_store), iter, 0, &name, 1, &local, -1);
+			if (g_strcmp0(config->theme, name) == 0) {
+				gtk_combo_box_set_active_iter(self->combo_theme, iter);
+				wibuti_prefs_reload_buttons(self, wibuti_config_get_buttons(config), local);
+				g_free(name);
+				return;				
+			}
+		} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(list_store), iter));
+	} else {
+		// TODO: show error
+	}
+}
+
+static void wibuti_prefs_reload_buttons(WibutiPrefs *self, GdkPixbuf ****buttons, gboolean local) {
+
+}
+
+#endif // WIBUTI_WITH_BUTTONS
 
 
 /**********************************************************************************************************************/

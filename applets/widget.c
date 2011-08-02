@@ -9,8 +9,6 @@
 #define WIBUTI_SIGNAL_CLOSE		"close-clicked"
 
 #ifdef WIBUTI_WITH_BUTTONS
-void wibuti_widget_hide_buttons(WibutiWidget *);
-
 static void wibuti_widget_release_cb(GtkEventBox *, GdkEvent *, WibutiWidget *);
 static void wibuti_widget_press_cb(GtkEventBox *, GdkEvent *, WibutiWidget *);
 static void wibuti_widget_enter_cb(GtkEventBox *, GdkEvent *, WibutiWidget *);
@@ -19,11 +17,6 @@ static void wibuti_widget_leave_cb(GtkEventBox *, GdkEvent *, WibutiWidget *);
 static WibutiButton wibuti_widget_get_button_num(WibutiWidget *, GtkEventBox *);
 static WibutiFocus wibuti_widget_get_draw_active(WibutiWidget *);
 #endif // WIBUTI_WITH_BUTTONS
-
-#ifdef WIBUTI_WITH_TITLE
-void wibuti_widget_hide_title(WibutiWidget *);
-void wibuti_widget_hide_icon(WibutiWidget *);
-#endif // WIBUTI_WITH_TITLE
 
 
 G_DEFINE_TYPE(WibutiWidget, wibuti_widget, GTK_TYPE_BOX);
@@ -206,8 +199,6 @@ void wibuti_widget_set_is_active(WibutiWidget *self, gboolean is_active) {
 #ifdef WIBUTI_WITH_BUTTONS
 
 void wibuti_widget_redraw_buttons(WibutiWidget *self) {
-	
-
 	WibutiFocus focus;
 	if (self->is_active) {
 		focus = WIBUTI_FOCUS_FOCUSED;

@@ -49,6 +49,6 @@ typedef struct {
 GType wibuti_prefs_get_type(void);
 WibutiPrefs *wibuti_prefs_new(void);
 
-void wibuti_prefs_set_from_config(WibutiPrefs *self, WibutiConfig *config);
+void wibuti_prefs_set_from_config(WibutiPrefs *, WibutiConfig *);
 
 #endif // __WIBUTI_PREFERENCES_H__
