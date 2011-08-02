@@ -12,21 +12,20 @@ G_DEFINE_TYPE(WibutiPrefs, wibuti_prefs, GTK_TYPE_WINDOW);
 
 static void wibuti_prefs_init(WibutiPrefs *self) {
 	GError *err = NULL;
-	GtkLabel *label_layout_tip;
 	char *markup = "";
-	
+	GtkBox *main_box = GTK_BOX(gtk_vbox_new(FALSE, 5));
+	GtkNotebook *notebook = GTK_NOTEBOOK(gtk_notebook_new());
+	GtkButton *btn_close = GTK_BUTTON(gtk_button_new_from_stock(GTK_STOCK_CLOSE));
+	GtkButtonBox *btnbox = GTK_BUTTON_BOX(gtk_hbutton_box_new());
+	GtkLabel *label_layout_tip = GTK_LABEL(gtk_label_new(""));
+
 	self->builder = gtk_builder_new();
-	self->main_box = GTK_BOX(gtk_vbox_new(FALSE, 5));
-	self->notebook = GTK_NOTEBOOK(gtk_notebook_new());
-	self->btn_close = GTK_BUTTON(gtk_button_new_from_stock(GTK_STOCK_CLOSE));
-	self->btnbox = GTK_BUTTON_BOX(gtk_hbutton_box_new());
-	label_layout_tip = GTK_LABEL(gtk_label_new(""));
 
 #ifdef WIBUTI_WITH_BUTTONS
-	GtkAlignment *alignment_theme, *alignment_buttons;	
-	GtkLabel *label_theme, *label_buttons;	
+	GtkAlignment *alignment_theme, *alignment_buttons;
+	GtkLabel *label_theme, *label_buttons;
 
-	self->combo_theme = gtk_combo_box_new_text();
+//	self->combo_theme = GTK_COMBO_BOX(gtk_combo_box_text_new());
 	gtk_builder_add_from_file(self->builder, WIBUTI_PATH_BUTTONS_UI, &err);
 
 	if (err != NULL) {
@@ -43,19 +42,19 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 		// fill themes combo
 		GDir *dir = g_dir_open(WIBUTI_PATH_THEMES, 0, NULL);
 		const gchar *subdir;
-	    while ((subdir = g_dir_read_name(dir)) != NULL) {
-	    	gtk_combo_append_text(subdir);
+		while ((subdir = g_dir_read_name(dir)) != NULL) {
+//			gtk_combo_box_text_append_text(self->combo_theme, subdir);
 		}
 		g_dir_close(dir);
 
 		// pack to notebook
-		label_themes = GTK_LABEL(gtk_label_new("Themes"));
-		gtk_notebook_append_page(self->notebook, GTK_WIDGET(alignment_themes), GTK_WIDGET(label_themes));
+		label_theme = GTK_LABEL(gtk_label_new("Themes"));
+		gtk_notebook_append_page(notebook, GTK_WIDGET(alignment_theme), GTK_WIDGET(label_theme));
 		label_buttons = GTK_LABEL(gtk_label_new("Buttons"));
-		gtk_notebook_append_page(self->notebook, GTK_WIDGET(alignment_buttons), GTK_WIDGET(label_buttons));
+		gtk_notebook_append_page(notebook, GTK_WIDGET(alignment_buttons), GTK_WIDGET(label_buttons));
 		
 		markup = g_strconcat(markup, "<b>M</b> - ", "minimize", "\n<b>R</b> - ", "maximize/restore", 
-                                     "\n<b>X</b> - ", "close", "\n", NULL);
+		                             "\n<b>X</b> - ", "close", "\n", NULL);
 	}
 #endif // WIBUTI_WITH_BUTTONS
 
@@ -82,7 +81,7 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 
 		// pack to notebook
 		label_title = GTK_LABEL(gtk_label_new("Title"));
-		gtk_notebook_append_page(self->notebook, GTK_WIDGET(alignment_title), GTK_WIDGET(label_title));
+		gtk_notebook_append_page(notebook, GTK_WIDGET(alignment_title), GTK_WIDGET(label_title));
 		
 		markup = g_strconcat(markup, "<b>I</b> - ", "icon", "\n<b>T</b> - ", "title", "\n", NULL);
 	}
@@ -100,17 +99,18 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 		label_layout_tip = GTK_LABEL(gtk_builder_get_object(self->builder, "label_layout_tip"));
 
 		self->chkb_only_maximized = GTK_TOGGLE_BUTTON(gtk_builder_get_object(self->builder, CFG_ONLY_MAXIMIZED));
+		self->chkb_hide_unmaximized = GTK_TOGGLE_BUTTON(gtk_builder_get_object(self->builder, CFG_HIDE_ON_UNMAXIMIZED));
 		self->btn_reload_layout = GTK_BUTTON(gtk_builder_get_object(self->builder, "btn_reload_layout"));
 		self->entry_layout = GTK_ENTRY(gtk_builder_get_object(self->builder, "entry_layout"));
 		
 		// pack to notebook
 		label_general = GTK_LABEL(gtk_label_new("General"));
-		gtk_notebook_append_page(self->notebook, GTK_WIDGET(alignment_general), GTK_WIDGET(label_general));
+		gtk_notebook_append_page(notebook, GTK_WIDGET(alignment_general), GTK_WIDGET(label_general));
 	}
 
 	// gui appearance
-	gtk_notebook_set_current_page(self->notebook, 0);
-	gtk_button_box_set_layout(self->btnbox, GTK_BUTTONBOX_END);
+	gtk_notebook_set_current_page(notebook, 0);
+	gtk_button_box_set_layout(btnbox, GTK_BUTTONBOX_END);
 	gtk_label_set_markup(label_layout_tip, markup);
 	g_free(markup);
 
@@ -118,13 +118,13 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 	g_object_set(GTK_WINDOW(self), "border-width", 3, NULL);
 
 	// pack gui
-	gtk_box_pack_start(GTK_BOX(self->btnbox), GTK_WIDGET(self->btn_close), FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(self->main_box), GTK_WIDGET(self->notebook), TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(self->main_box), GTK_WIDGET(self->btnbox), FALSE, TRUE, 0);
-	gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->main_box));
+	gtk_box_pack_start(GTK_BOX(btnbox), GTK_WIDGET(btn_close), FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(notebook), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(main_box), GTK_WIDGET(btnbox), FALSE, TRUE, 0);
+	gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(main_box));
 
 	// connect signals
-	g_signal_connect(self->btn_close, "clicked", G_CALLBACK(wibuti_prefs_close_cb), self);
+	g_signal_connect(btn_close, "clicked", G_CALLBACK(wibuti_prefs_close_cb), self);
 	g_signal_connect(self, "delete-event", G_CALLBACK(wibuti_prefs_delete_cb), self);
 }
 
@@ -141,6 +141,7 @@ WibutiPrefs* wibuti_prefs_new(void) {
 
 void wibuti_prefs_set_from_config(WibutiPrefs *self, WibutiConfig *config) {
 	gtk_toggle_button_set_active(self->chkb_only_maximized, config->only_maximized);
+	gtk_toggle_button_set_active(self->chkb_hide_unmaximized, config->hide_on_unmaximized);
 	gtk_entry_set_text(self->entry_layout, config->layout);
 
 #ifdef WIBUTI_WITH_BUTTONS

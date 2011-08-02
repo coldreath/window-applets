@@ -16,15 +16,12 @@ typedef struct {
 	GtkWindow parent;
 
 	GtkBuilder   *builder;
-	GtkBox       *main_box;
-	GtkNotebook  *notebook;
-	GtkButtonBox *btnbox;
-	GtkButton    *btn_close;
 
 	// settings
 	GtkButton       *btn_reload_layout;
 	GtkEntry        *entry_layout;
 	GtkToggleButton *chkb_only_maximized;
+	GtkToggleButton *chkb_hide_unmaximized;
 
 #ifdef WIBUTI_WITH_BUTTONS
 	GtkComboBox     *combo_theme; 

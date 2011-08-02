@@ -1,0 +1,7 @@
+[Xfce Panel]
+Type=X-XFCE-PanelPlugin
+Encoding=UTF-8
+Name=Window Buttons and Title Applet
+Comment=Shows window buttons and Title
+Icon=windowapplet
+X-XFCE-Exec=/usr/libexec/xfce4/panel-plugins/xfce4-windowapplet-plugin

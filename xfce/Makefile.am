@@ -26,17 +26,26 @@ xfce4_windowbuttons_plugin_CFLAGS = ${XFCE_PANEL_CFLAGS} ${WNCK_CFLAGS}
 xfce4_windowbuttons_plugin_LDADD = ${XFCE_PANEL_LIBS} ${WNCK_LIBS}
 xfce4_windowbuttons_plugin_SOURCES = ${WIBUTI_SRC}
 
+xfce4_windowapplet_plugin_CFLAGS = ${XFCE_PANEL_CFLAGS} ${WNCK_CFLAGS}
+xfce4_windowapplet_plugin_LDADD = ${XFCE_PANEL_LIBS} ${WNCK_LIBS}
+xfce4_windowapplet_plugin_SOURCES = ${WIBUTI_SRC}
+
 
 xfcelibexec_PROGRAMS = 
 desktopfile_DATA = 
 
-if WIBUTI_WITH_BUTTONS
+if WIBUTI_WITH_BUTTONS_AND_NOT_TITLE
 xfcelibexec_PROGRAMS += xfce4-windowbuttons-plugin 
 desktopfile_DATA += xfce4-windowbuttons-plugin.desktop
 endif
 
-if WIBUTI_WITH_TITLE
+if WIBUTI_WITH_TITLE_AND_NOT_BUTTONS
 xfcelibexec_PROGRAMS += xfce4-windowtitle-plugin 
 desktopfile_DATA += xfce4-windowtitle-plugin.desktop
+endif
+
+if WIBUTI_WITH_BUTTONS_AND_TITLE
+xfcelibexec_PROGRAMS += xfce4-windowapplet-plugin 
+desktopfile_DATA += xfce4-windowapplets-plugin.desktop
 endif
 

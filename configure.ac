@@ -41,7 +41,6 @@ AC_ARG_WITH(
 	[buttons="false"]
 )
 AC_MSG_RESULT([$buttons])
-AM_CONDITIONAL([WIBUTI_WITH_BUTTONS], [test "$buttons" = "true"])
 if test "$buttons" = "true"
 then
 	AC_DEFINE([WIBUTI_WITH_BUTTONS], [TRUE], [Use buttons])
@@ -61,7 +60,6 @@ AC_ARG_WITH(
 	[title=false]
 )
 AC_MSG_RESULT([$withval])
-AM_CONDITIONAL([WIBUTI_WITH_TITLE], [test "$title" = "true"])
 if test "$title" = "true"
 then
 	AC_DEFINE([WIBUTI_WITH_TITLE], [TRUE], [Use title])
@@ -73,6 +71,13 @@ if test "$title" = "false" && test "$buttons" = "false"
 then
 	AC_MSG_ERROR([you have to specify the applet with --with-title=yes or --with-buttons=yes])
 fi
+
+AM_CONDITIONAL([WIBUTI_WITH_BUTTONS],               [test "$buttons" = "true"])
+AM_CONDITIONAL([WIBUTI_WITH_TITLE],                 [test "$title"   = "true"])
+AM_CONDITIONAL([WIBUTI_WITH_BUTTONS_AND_NOT_TITLE], [test "$buttons" = "true"  && test "$title" = "false" ])
+AM_CONDITIONAL([WIBUTI_WITH_TITLE_AND_NOT_BUTTONS], [test "$buttons" = "false" && test "$title" = "false" ])
+AM_CONDITIONAL([WIBUTI_WITH_BUTTONS_AND_TITLE],     [test "$buttons" = "true"  && test "$title" = "true" ])
+
 
 
 # CHECK FOR AVAIBLE MODULES
@@ -93,6 +98,7 @@ WIBUTI_PATH_TITLE_UI="${WIBUTI_PATH_CONF}/title-preferences.ui"
 WIBUTI_PATH_THEMES="${WIBUTI_PATH_CONF}/themes"
 
 AC_SUBST([WIBUTI_PATH_CONF], [${WIBUTI_PATH_CONF}])
+AC_SUBST([WIBUTI_PATH_THEMES], [${WIBUTI_PATH_THEMES}])
 
 AC_DEFINE_UNQUOTED([WIBUTI_PATH_GENERAL_UI], ["${WIBUTI_PATH_GENERAL_UI}"], [General builder file])
 AC_DEFINE_UNQUOTED([WIBUTI_PATH_BUTTONS_UI], ["${WIBUTI_PATH_BUTTONS_UI}"], [Builder file for buttons])

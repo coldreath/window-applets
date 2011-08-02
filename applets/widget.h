@@ -25,23 +25,28 @@ typedef struct {
 	GtkBox *box;
 	WibutiWidgetAngle angle;
 	
+	gboolean only_maximized;
+	gboolean is_active;
+	
 #ifdef WIBUTI_WITH_BUTTONS
 	gboolean use_close;
 	gboolean use_maximize;
 	gboolean use_minimize;
+	
+	gboolean click_effect;
+	gboolean hover_effect;
+	gboolean is_maximized;
 
-	GtkEventBox		*evbox_minimize;
-	GtkEventBox		*evbox_maximize;
-	GtkEventBox		*evbox_close;
-	GtkImage		*image_minimize;
-	GtkImage		*image_maximize;
-	GtkImage		*image_close;
-	GdkPixbuf		***buttons;
+	GtkEventBox		**evbox;
+	GtkImage		**image;
+	GdkPixbuf		****buttons;
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
 	gboolean use_title;
 	gboolean use_icon;
+	
+	gboolean expand_title;
 
 	GtkEventBox		*evbox_title;
 	GtkEventBox		*evbox_icon;
@@ -58,19 +63,25 @@ typedef struct {
 GType wibuti_widget_get_type(void);
 WibutiWidget* wibuti_widget_new(void);
 
-void wibuti_widget_change_angle(WibutiWidget *self, WibutiWidgetAngle angle);
-void wibuti_widget_repack_with_string(WibutiWidget *self, const gchar *string);
+void wibuti_widget_change_angle(WibutiWidget *, WibutiWidgetAngle);
+void wibuti_widget_repack_with_string(WibutiWidget *, const gchar *);
+void wibuti_widget_set_only_maximized(WibutiWidget *, gboolean);
+void wibuti_widget_set_is_active(WibutiWidget *, gboolean);
 
 #ifdef WIBUTI_WITH_BUTTONS
-void wibuti_widget_change_theme(WibutiWidget *self, GdkPixbuf ***pixbufs);
+void wibuti_widget_change_theme(WibutiWidget *, GdkPixbuf ****);
+void wibuti_widget_redraw_buttons(WibutiWidget *);
+void wibuti_widget_set_click_effect(WibutiWidget *, gboolean);
+void wibuti_widget_set_hover_effect(WibutiWidget *, gboolean);
+void wibuti_widget_set_maximized(WibutiWidget *, gboolean);
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
-void wibuti_widget_set_title(WibutiWidget *self, const gchar *title, gboolean is_active);
-void wibuti_widget_set_markup_title(WibutiWidget *self, const gchar *title, const gchar *font, const gchar *color);
-void wibuti_widget_set_expand_title(WibutiWidget *self, gboolean expand);
-void wibuti_widget_set_icon(WibutiWidget *self, GdkPixbuf *icon, gboolean is_active);
-void wibuti_widget_set_alignment(WibutiWidget *self, gdouble value);
+void wibuti_widget_set_title(WibutiWidget *, const gchar *, gboolean);
+void wibuti_widget_set_markup_title(WibutiWidget *, const gchar *, const gchar *, const gchar *);
+void wibuti_widget_set_icon(WibutiWidget *, GdkPixbuf *);
+void wibuti_widget_set_expand_title(WibutiWidget *, gboolean);
+void wibuti_widget_set_alignment(WibutiWidget *, gdouble);
 #endif // WIBUTI_WITH_TITLE
 
 #endif // __WIBUTI_WIDGET_H__

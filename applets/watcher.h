@@ -22,10 +22,13 @@ typedef struct {
 	WnckWindow *active;
 	WnckScreen *screen;
 	
-	gulong handler_name_changed;
-	gulong handler_icon_changed;
 	gulong handler_tracked_state_changed;
 	gulong handler_active_state_changed;
+
+#ifdef WIBUTI_WITH_TITLE
+	gulong handler_name_changed;
+	gulong handler_icon_changed;
+#endif // WIBUTI_WITH_TITLE
 
 	gboolean only_maximized;
 } WibutiWatcher;
@@ -37,14 +40,19 @@ typedef struct {
 GType wibuti_watcher_get_type(void);
 WibutiWatcher* wibuti_watcher_new(void);
 
-void wibuti_watcher_set_only_maximized(WibutiWatcher *self, gboolean only_maximized);
-gboolean wibuti_watcher_is_active(WibutiWatcher *self);
+void wibuti_watcher_set_only_maximized(WibutiWatcher *, gboolean);
+gboolean wibuti_watcher_is_active(WibutiWatcher *);
 
 #ifdef WIBUTI_WITH_BUTTONS
+void wibuti_watcher_minimize(WibutiWatcher *);
+void wibuti_watcher_maximize_restore(WibutiWatcher *);
+void wibuti_watcher_close(WibutiWatcher *);
+gboolean wibuti_watcher_is_maximized(WibutiWatcher *);
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
-const gchar *wibuti_watcher_get_title(WibutiWatcher *self);
-GdkPixbuf *wibuti_watcher_get_icon(WibutiWatcher *self);
+const gchar *wibuti_watcher_get_title(WibutiWatcher *);
+GdkPixbuf *wibuti_watcher_get_icon(WibutiWatcher *);
 #endif // WIBUTI_WITH_TITLE
 
 #endif // __WIBUTI_WATCHER_H__

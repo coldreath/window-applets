@@ -1,23 +1,21 @@
 #include "applets/watcher.h"
 
-#define WATCHER_SIGNAL_WINDOW_CHANGED	"window-changed"
-#define WATCHER_SIGNAL_NAME_CHANGED		"name-changed"
-#define WATCHER_SIGNAL_ICON_CHANGED		"icon-changed"
+#define WIBUTI_SIGNAL_WINDOW_CHANGED	"window-changed"
+#define WIBUTI_SIGNAL_NAME_CHANGED		"name-changed"
+#define WIBUTI_SIGNAL_ICON_CHANGED		"icon-changed"
 
-static void wibuti_watcher_find_window(WibutiWatcher *self);
+static void wibuti_watcher_find_window(WibutiWatcher *);
 
 // callbacks
-static void wibuti_watcher_active_workspace_changed_cb(WnckScreen *screen, WnckWorkspace *workspace,
-                                                       WibutiWatcher *self);
-static void wibuti_watcher_active_window_changed_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self);
-static void wibuti_watcher_viewports_changed_cb(WnckScreen *screen, WibutiWatcher *self);
-static void wibuti_watcher_window_closed_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self);
-static void wibuti_watcher_window_opened_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self);
-static void wibuti_watcher_window_state_changed_cb(WnckWindow *window, WnckWindowState changed_mask, 
-                                                   WnckWindowState new_state, WibutiWatcher *self);
-static void wibuti_watcher_window_changed_emit(WibutiWatcher *self);
-static void wibuti_watcher_name_changed_cb(WnckScreen *screen, WibutiWatcher *self);
-static void wibuti_watcher_icon_changed_cb(WnckScreen *screen, WibutiWatcher *self);
+static void wibuti_watcher_active_workspace_changed_cb(WnckScreen *, WnckWorkspace *, WibutiWatcher *);
+static void wibuti_watcher_active_window_changed_cb(WnckScreen *, WnckWindow *, WibutiWatcher *);
+static void wibuti_watcher_viewports_changed_cb(WnckScreen *, WibutiWatcher *);
+static void wibuti_watcher_window_closed_cb(WnckScreen *, WnckWindow *, WibutiWatcher *);
+static void wibuti_watcher_window_opened_cb(WnckScreen *, WnckWindow *, WibutiWatcher *);
+static void wibuti_watcher_window_state_changed_cb(WnckWindow *, WnckWindowState, WnckWindowState, WibutiWatcher *);
+static void wibuti_watcher_window_changed_emit(WibutiWatcher *);
+static void wibuti_watcher_name_changed_cb(WnckScreen *, WibutiWatcher *);
+static void wibuti_watcher_icon_changed_cb(WnckScreen *, WibutiWatcher *);
 
 
 /**********************************************************************************************************************/
@@ -26,11 +24,11 @@ static void wibuti_watcher_icon_changed_cb(WnckScreen *screen, WibutiWatcher *se
 G_DEFINE_TYPE(WibutiWatcher, wibuti_watcher, G_TYPE_OBJECT);
 
 static void wibuti_watcher_class_init(WibutiWatcherClass *klass) {
-	g_signal_newv(WATCHER_SIGNAL_WINDOW_CHANGED, WIBUTI_TYPE_WATCHER, G_SIGNAL_RUN_LAST,
+	g_signal_newv(WIBUTI_SIGNAL_WINDOW_CHANGED, WIBUTI_TYPE_WATCHER, G_SIGNAL_RUN_LAST,
 				NULL, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, NULL);
-	g_signal_newv(WATCHER_SIGNAL_NAME_CHANGED, WIBUTI_TYPE_WATCHER, G_SIGNAL_RUN_LAST,
+	g_signal_newv(WIBUTI_SIGNAL_NAME_CHANGED, WIBUTI_TYPE_WATCHER, G_SIGNAL_RUN_LAST,
 				NULL, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, NULL);
-	g_signal_newv(WATCHER_SIGNAL_ICON_CHANGED, WIBUTI_TYPE_WATCHER, G_SIGNAL_RUN_LAST,
+	g_signal_newv(WIBUTI_SIGNAL_ICON_CHANGED, WIBUTI_TYPE_WATCHER, G_SIGNAL_RUN_LAST,
 				NULL, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, NULL);
 }
 
@@ -53,7 +51,7 @@ static void wibuti_watcher_init(WibutiWatcher *self) {
 	g_signal_connect(G_OBJECT(self->screen), "window-opened",
 	                 G_CALLBACK(wibuti_watcher_window_opened_cb), self);
 	
-	g_signal_emit_by_name(self, WATCHER_SIGNAL_WINDOW_CHANGED);
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_WINDOW_CHANGED);
 }
 
 WibutiWatcher* wibuti_watcher_new(void) {
@@ -127,7 +125,9 @@ static void wibuti_watcher_find_window(WibutiWatcher *self) {
 /**********************************************************************************************************************/
 
 
-static void wibuti_watcher_active_workspace_changed_cb(WnckScreen *screen, WnckWorkspace *workspace, WibutiWatcher *self) {
+static void wibuti_watcher_active_workspace_changed_cb(WnckScreen *screen,
+                                                       WnckWorkspace *workspace,
+                                                       WibutiWatcher *self) {
 	wibuti_watcher_window_changed_emit(self);
 }
 
@@ -148,21 +148,21 @@ static void wibuti_watcher_window_opened_cb(WnckScreen *screen, WnckWindow *wind
 }
 
 static void wibuti_watcher_window_state_changed_cb(WnckWindow *window, WnckWindowState changed_mask, 
-                                            WnckWindowState new_state, WibutiWatcher *self) {
+                                                   WnckWindowState new_state, WibutiWatcher *self) {
 	wibuti_watcher_window_changed_emit(self);
 }
 
 static void wibuti_watcher_window_changed_emit(WibutiWatcher *self) {
 	wibuti_watcher_find_window(self);
-	g_signal_emit_by_name(self, WATCHER_SIGNAL_WINDOW_CHANGED);
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_WINDOW_CHANGED);
 }
 
 static void wibuti_watcher_name_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
-	g_signal_emit_by_name(self, WATCHER_SIGNAL_NAME_CHANGED);
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_NAME_CHANGED);
 }
 
 static void wibuti_watcher_icon_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
-	g_signal_emit_by_name(self, WATCHER_SIGNAL_ICON_CHANGED);
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_ICON_CHANGED);
 }
 
 
@@ -179,7 +179,39 @@ gboolean wibuti_watcher_is_active(WibutiWatcher *self) {
 }
 
 #ifdef WIBUTI_WITH_BUTTONS
+
+void wibuti_watcher_minimize(WibutiWatcher *self) {
+	if (WNCK_IS_WINDOW(self->tracked)) {
+		wnck_window_minimize(self->tracked);
+	}
+}
+
+void wibuti_watcher_maximize_restore(WibutiWatcher *self) {
+	if (WNCK_IS_WINDOW(self->tracked)) {
+		if (wnck_window_is_maximized(self->tracked)) {
+			wnck_window_unmaximize(self->tracked);
+		} else {
+			wnck_window_maximize(self->tracked);
+		}
+	}
+}
+
+void wibuti_watcher_close(WibutiWatcher *self) {
+	if (WNCK_IS_WINDOW(self->tracked)) {
+		wnck_window_close(self->tracked, GDK_CURRENT_TIME);
+	}
+}
+
+gboolean wibuti_watcher_is_maximized(WibutiWatcher *self) {
+	if (WNCK_IS_WINDOW(self->tracked)) {
+		return wnck_window_is_maximized(self->tracked);
+	} else {
+		return FALSE;
+	}
+}
+
 #endif // WIBUTI_WITH_BUTTONS
+
 #ifdef WIBUTI_WITH_TITLE
 
 const gchar *wibuti_watcher_get_title(WibutiWatcher *self) {

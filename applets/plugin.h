@@ -30,15 +30,17 @@ typedef struct {
 GType wibuti_plugin_get_type(void);
 WibutiPlugin* wibuti_plugin_new(void);
 
-void wibuti_plugin_show_preferences(WibutiPlugin *self);
+void wibuti_plugin_show_preferences(WibutiPlugin *);
 void wibuti_plugin_update(WibutiPlugin *self);
+void wibuti_plugin_redraw(WibutiPlugin *self);
 
 #ifdef WIBUTI_WITH_BUTTONS
+void wibuti_plugin_redraw_buttons(WibutiPlugin *);
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
-void wibuti_plugin_update_title(WibutiPlugin *self);
-void wibuti_plugin_update_icon(WibutiPlugin *self);
+void wibuti_plugin_redraw_title(WibutiPlugin *);
+void wibuti_plugin_redraw_icon(WibutiPlugin *);
 #endif // WIBUTI_WITH_TITLE
 
 #endif // __WIBUTI_PLUGIN_H__
