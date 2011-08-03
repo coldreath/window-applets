@@ -20,7 +20,7 @@ typedef enum {
 #define WIBUTI_WIDGET_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), WIBUTI_TYPE_WIDGET, WibutiWidgetClass))
 
 typedef struct {
-	GtkBox parent;
+	GtkEventBox parent;
 
 	GtkBox *box;
 	WibutiWidgetAngle angle;

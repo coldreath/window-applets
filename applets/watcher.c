@@ -14,8 +14,10 @@ static void wibuti_watcher_window_closed_cb(WnckScreen *, WnckWindow *, WibutiWa
 static void wibuti_watcher_window_opened_cb(WnckScreen *, WnckWindow *, WibutiWatcher *);
 static void wibuti_watcher_window_state_changed_cb(WnckWindow *, WnckWindowState, WnckWindowState, WibutiWatcher *);
 static void wibuti_watcher_window_changed_emit(WibutiWatcher *);
+#ifdef WIBUTI_WITH_TITLE
 static void wibuti_watcher_name_changed_cb(WnckScreen *, WibutiWatcher *);
 static void wibuti_watcher_icon_changed_cb(WnckScreen *, WibutiWatcher *);
+#endif // WIBUTI_WITH_TITLE
 
 
 /**********************************************************************************************************************/
@@ -96,12 +98,14 @@ static void wibuti_watcher_find_window(WibutiWatcher *self) {
 
 	// stop tracking the old window
 	if (G_IS_OBJECT(self->tracked)) {
+#ifdef WIBUTI_WITH_TITLE
 		if (g_signal_handler_is_connected(G_OBJECT(self->tracked), self->handler_name_changed)) {
 			g_signal_handler_disconnect(G_OBJECT(self->tracked), self->handler_name_changed);
 		}
 		if (g_signal_handler_is_connected(G_OBJECT(self->tracked), self->handler_icon_changed)) {
 			g_signal_handler_disconnect(G_OBJECT(self->tracked), self->handler_icon_changed);
 		}
+#endif // WIBUTI_WITH_TITLE
 		if (g_signal_handler_is_connected(G_OBJECT(self->tracked), self->handler_tracked_state_changed)) {
 			g_signal_handler_disconnect(G_OBJECT(self->tracked), self->handler_tracked_state_changed);
 		}
@@ -109,60 +113,18 @@ static void wibuti_watcher_find_window(WibutiWatcher *self) {
 
 	// start tracking the new window
 	if (new_tracked) {
+#ifdef WIBUTI_WITH_TITLE
 		self->handler_name_changed = g_signal_connect(G_OBJECT(new_tracked), "name-changed",
 	                                                  G_CALLBACK(wibuti_watcher_name_changed_cb), self);
 		self->handler_icon_changed = g_signal_connect(G_OBJECT(new_tracked), "icon-changed",
 	                                                  G_CALLBACK(wibuti_watcher_icon_changed_cb), self);
+#endif // WIBUTI_WITH_TITLE
 		self->handler_tracked_state_changed = g_signal_connect(G_OBJECT(new_tracked), "state-changed",
                                                       G_CALLBACK(wibuti_watcher_window_state_changed_cb), self);
 	}
 	
 	self->tracked = new_tracked;
 	self->active = new_active;
-}
-
-
-/**********************************************************************************************************************/
-
-
-static void wibuti_watcher_active_workspace_changed_cb(WnckScreen *screen,
-                                                       WnckWorkspace *workspace,
-                                                       WibutiWatcher *self) {
-	wibuti_watcher_window_changed_emit(self);
-}
-
-static void wibuti_watcher_active_window_changed_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self) {
-	wibuti_watcher_window_changed_emit(self);
-}
-
-static void wibuti_watcher_viewports_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
-	wibuti_watcher_window_changed_emit(self);
-}
-
-static void wibuti_watcher_window_closed_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self) {
-	wibuti_watcher_window_changed_emit(self);
-}
-
-static void wibuti_watcher_window_opened_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self) {
-	wibuti_watcher_window_changed_emit(self);
-}
-
-static void wibuti_watcher_window_state_changed_cb(WnckWindow *window, WnckWindowState changed_mask, 
-                                                   WnckWindowState new_state, WibutiWatcher *self) {
-	wibuti_watcher_window_changed_emit(self);
-}
-
-static void wibuti_watcher_window_changed_emit(WibutiWatcher *self) {
-	wibuti_watcher_find_window(self);
-	g_signal_emit_by_name(self, WIBUTI_SIGNAL_WINDOW_CHANGED);
-}
-
-static void wibuti_watcher_name_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
-	g_signal_emit_by_name(self, WIBUTI_SIGNAL_NAME_CHANGED);
-}
-
-static void wibuti_watcher_icon_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
-	g_signal_emit_by_name(self, WIBUTI_SIGNAL_ICON_CHANGED);
 }
 
 
@@ -228,6 +190,54 @@ GdkPixbuf *wibuti_watcher_get_icon(WibutiWatcher *self) {
 	} else {
 		return NULL;
 	}
+}
+
+#endif // WIBUTI_WITH_TITLE
+
+
+/**********************************************************************************************************************/
+
+
+static void wibuti_watcher_active_workspace_changed_cb(WnckScreen *screen,
+                                                       WnckWorkspace *workspace,
+                                                       WibutiWatcher *self) {
+	wibuti_watcher_window_changed_emit(self);
+}
+
+static void wibuti_watcher_active_window_changed_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self) {
+	wibuti_watcher_window_changed_emit(self);
+}
+
+static void wibuti_watcher_viewports_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
+	wibuti_watcher_window_changed_emit(self);
+}
+
+static void wibuti_watcher_window_closed_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self) {
+	wibuti_watcher_window_changed_emit(self);
+}
+
+static void wibuti_watcher_window_opened_cb(WnckScreen *screen, WnckWindow *window, WibutiWatcher *self) {
+	wibuti_watcher_window_changed_emit(self);
+}
+
+static void wibuti_watcher_window_state_changed_cb(WnckWindow *window, WnckWindowState changed_mask, 
+                                                   WnckWindowState new_state, WibutiWatcher *self) {
+	wibuti_watcher_window_changed_emit(self);
+}
+
+static void wibuti_watcher_window_changed_emit(WibutiWatcher *self) {
+	wibuti_watcher_find_window(self);
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_WINDOW_CHANGED);
+}
+
+#ifdef WIBUTI_WITH_TITLE
+
+static void wibuti_watcher_name_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_NAME_CHANGED);
+}
+
+static void wibuti_watcher_icon_changed_cb(WnckScreen *screen, WibutiWatcher *self) {
+	g_signal_emit_by_name(self, WIBUTI_SIGNAL_ICON_CHANGED);
 }
 
 #endif // WIBUTI_WITH_TITLE

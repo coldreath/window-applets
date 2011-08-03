@@ -19,7 +19,7 @@ static WibutiFocus wibuti_widget_get_draw_active(WibutiWidget *);
 #endif // WIBUTI_WITH_BUTTONS
 
 
-G_DEFINE_TYPE(WibutiWidget, wibuti_widget, GTK_TYPE_BOX);
+G_DEFINE_TYPE(WibutiWidget, wibuti_widget, GTK_TYPE_EVENT_BOX);
 
 static void wibuti_widget_init(WibutiWidget *self) {
 	self->box = GTK_BOX(gtk_hbox_new(FALSE, 2));
@@ -57,8 +57,8 @@ static void wibuti_widget_init(WibutiWidget *self) {
 	self->use_title = self->use_icon = FALSE;
 #endif // WIBUTI_WITH_TITLE
 
-	gtk_box_pack_start(GTK_BOX(self), GTK_WIDGET(self->box), TRUE, TRUE, 0);
-	wibuti_widget_repack_with_string(self, "");
+	gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->box));
+	wibuti_widget_repack_with_string(self, ""); // TODO: is it needed?
 }
 
 static void wibuti_widget_class_init(WibutiWidgetClass *klass) {
@@ -122,16 +122,16 @@ void wibuti_widget_repack_with_string(WibutiWidget *self, const gchar *string) {
 		switch (string[i]) {
 #ifdef WIBUTI_WITH_BUTTONS
 			case 'M': {
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_MINIMIZE]), FALSE, FALSE,0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_MINIMIZE]), FALSE, TRUE,0);
 				self->use_minimize = TRUE;
 				break;
 			} case 'R': {
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_MAXIMIZE]), FALSE, FALSE,0);
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_RESTORE]), FALSE, FALSE, 0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_MAXIMIZE]), FALSE, TRUE,0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_RESTORE]), FALSE, TRUE, 0);
 				self->use_maximize = TRUE;
 				break;
 			} case 'X': {
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_CLOSE]), FALSE, FALSE, 0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox[WIBUTI_BUTTON_CLOSE]), FALSE, TRUE, 0);
 				self->use_close = TRUE;
 				break;
 			}
@@ -139,12 +139,12 @@ void wibuti_widget_repack_with_string(WibutiWidget *self, const gchar *string) {
 
 #ifdef WIBUTI_WITH_TITLE
 			case 'T': {
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), FALSE, FALSE, 0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), FALSE, TRUE, 0);
 				wibuti_widget_set_expand_title(self, self->expand_title);
 				self->use_title = TRUE;
 				break;
 			} case 'I': {
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_icon), FALSE, FALSE, 0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_icon), FALSE, TRUE, 0);
 				self->use_icon = TRUE;
 				break;
 			}

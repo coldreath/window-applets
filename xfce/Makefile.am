@@ -35,17 +35,17 @@ xfcelibexec_PROGRAMS =
 desktopfile_DATA = 
 
 if WIBUTI_WITH_BUTTONS_AND_NOT_TITLE
-xfcelibexec_PROGRAMS += xfce4-windowbuttons-plugin 
+xfcelibexec_PROGRAMS += xfce4-windowbuttons-plugin
 desktopfile_DATA += xfce4-windowbuttons-plugin.desktop
 endif
 
 if WIBUTI_WITH_TITLE_AND_NOT_BUTTONS
-xfcelibexec_PROGRAMS += xfce4-windowtitle-plugin 
+xfcelibexec_PROGRAMS += xfce4-windowtitle-plugin
 desktopfile_DATA += xfce4-windowtitle-plugin.desktop
 endif
 
 if WIBUTI_WITH_BUTTONS_AND_TITLE
-xfcelibexec_PROGRAMS += xfce4-windowapplet-plugin 
+xfcelibexec_PROGRAMS += xfce4-windowapplet-plugin
 desktopfile_DATA += xfce4-windowapplets-plugin.desktop
 endif
 

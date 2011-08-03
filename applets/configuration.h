@@ -80,16 +80,16 @@ typedef struct {
 #endif // WIBUTI_WITH_TITLE
 } WibutiConfig;
 
-void wibuti_config_load_defaults(WibutiConfig *self);
+void wibuti_config_load_defaults(WibutiConfig *);
 
-void wibuti_config_load_plain(WibutiConfig *self);
-void wibuti_config_save_plain(WibutiConfig *self);
+void wibuti_config_load_plain(WibutiConfig *);
+void wibuti_config_save_plain(WibutiConfig *);
 // TODO
-//void wibuti_config_load_gconf(WibutiConfig *self);
-//void wibuti_config_save_gconf(WibutiConfig *self);
+//void wibuti_config_load_gconf(WibutiConfig *);
+//void wibuti_config_save_gconf(WibutiConfig *);
 
 #ifdef WIBUTI_WITH_BUTTONS
-GdkPixbuf ****wibuti_config_get_buttons(WibutiConfig *self);
+GdkPixbuf ****wibuti_config_get_buttons(WibutiConfig *);
 #endif // WIBUTI_WITH_BUTTONS
 
 #endif // __WIBUTI_CONFIG_H__

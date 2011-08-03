@@ -75,7 +75,7 @@ fi
 AM_CONDITIONAL([WIBUTI_WITH_BUTTONS],               [test "$buttons" = "true"])
 AM_CONDITIONAL([WIBUTI_WITH_TITLE],                 [test "$title"   = "true"])
 AM_CONDITIONAL([WIBUTI_WITH_BUTTONS_AND_NOT_TITLE], [test "$buttons" = "true"  && test "$title" = "false" ])
-AM_CONDITIONAL([WIBUTI_WITH_TITLE_AND_NOT_BUTTONS], [test "$buttons" = "false" && test "$title" = "false" ])
+AM_CONDITIONAL([WIBUTI_WITH_TITLE_AND_NOT_BUTTONS], [test "$buttons" = "false" && test "$title" = "true" ])
 AM_CONDITIONAL([WIBUTI_WITH_BUTTONS_AND_TITLE],     [test "$buttons" = "true"  && test "$title" = "true" ])
 
 

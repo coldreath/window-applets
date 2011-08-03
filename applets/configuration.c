@@ -6,7 +6,7 @@
 #define FILE_BUTTONS_CONFIG	"/.config/windowbuttons.conf"
 #define FILE_TITLE_CONFIG	"/.config/windowtitle.conf"
 
-static gchar* wibuti_config_get_value(FILE *f, gchar *key);
+static gchar* wibuti_config_get_value(FILE *, gchar *);
 
 
 /**********************************************************************************************************************/
