@@ -46,6 +46,7 @@ static void wibuti_prefs_init(WibutiPrefs *self) {
 		GtkListStore *list_store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT);
 		GtkCellRenderer *renderer = gtk_cell_renderer_text_new();
 		gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(self->combo_theme), renderer, TRUE);
+		gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(self->combo_theme), renderer, "text", 0, NULL);
 		gtk_combo_box_set_model(self->combo_theme, GTK_TREE_MODEL(list_store));
 
 		const gchar *subdir;
@@ -182,17 +183,17 @@ static void wibuti_prefs_set_theme(WibutiPrefs *self, WibutiConfig *config) {
 	gchar *name;
 	int local;
 	GtkListStore *list_store = GTK_LIST_STORE(gtk_combo_box_get_model(self->combo_theme));
-	GtkTreeIter *iter = g_new(GtkTreeIter, 1);
-	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(list_store), iter)) {
+	GtkTreeIter iter;
+	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(list_store), &iter)) {
 		do {
-			gtk_tree_model_get(GTK_TREE_MODEL(list_store), iter, 0, &name, 1, &local, -1);
+			gtk_tree_model_get(GTK_TREE_MODEL(list_store), &iter, 0, &name, 1, &local, -1);
 			if (g_strcmp0(config->theme, name) == 0) {
-				gtk_combo_box_set_active_iter(self->combo_theme, iter);
+				gtk_combo_box_set_active_iter(self->combo_theme, &iter);
 				wibuti_prefs_reload_buttons(self, wibuti_config_get_buttons(config), local);
 				g_free(name);
-				return;				
+				return;
 			}
-		} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(list_store), iter));
+		} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(list_store), &iter));
 	} else {
 		// TODO: show error
 	}

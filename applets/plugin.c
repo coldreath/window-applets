@@ -19,6 +19,7 @@ static void wibuti_plugin_close_cb(WibutiWidget *, WibutiPlugin *);
 
 static void wibuti_plugin_click_effect_toggled_cb(GtkToggleButton *, WibutiPlugin *);
 static void wibuti_plugin_hover_effect_toggled_cb(GtkToggleButton *, WibutiPlugin *);
+static void wibuti_plugin_theme_changed_cb(GtkComboBox *, WibutiPlugin *);
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
@@ -114,6 +115,8 @@ void wibuti_plugin_show_preferences(WibutiPlugin *self) {
 		                 G_CALLBACK(wibuti_plugin_hover_effect_toggled_cb), self);
 		g_signal_connect(G_OBJECT(self->prefs->chkb_click_effect), "toggled",
 		                 G_CALLBACK(wibuti_plugin_click_effect_toggled_cb), self);
+		g_signal_connect(G_OBJECT(self->prefs->combo_theme), "changed",
+		                 G_CALLBACK(wibuti_plugin_theme_changed_cb), self);
 #endif // WIBUTI_WITH_BUTTONS
 
 #ifdef WIBUTI_WITH_TITLE
@@ -258,6 +261,15 @@ static void wibuti_plugin_click_effect_toggled_cb(GtkToggleButton *btn, WibutiPl
 
 static void wibuti_plugin_hover_effect_toggled_cb(GtkToggleButton *btn, WibutiPlugin *self) {
 	wibuti_widget_set_hover_effect(self->widget, gtk_toggle_button_get_active(btn));
+}
+
+static void wibuti_plugin_theme_changed_cb(GtkComboBox *combo, WibutiPlugin *self) {
+	gint local;
+	GtkTreeIter iter;
+	GtkTreeModel *model = gtk_combo_box_get_model(combo); 
+	gtk_combo_box_get_active_iter(combo, &iter);
+	gtk_tree_model_get(model, &iter, 0, &self->config.theme, 1, &local, -1);
+	wibuti_widget_change_theme(self->widget, wibuti_config_get_buttons(&self->config));
 }
 
 #endif // WIBUTI_WITH_BUTTONS
