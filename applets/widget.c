@@ -22,7 +22,7 @@ static WibutiFocus wibuti_widget_get_draw_active(WibutiWidget *);
 G_DEFINE_TYPE(WibutiWidget, wibuti_widget, GTK_TYPE_EVENT_BOX);
 
 static void wibuti_widget_init(WibutiWidget *self) {
-	self->box = GTK_BOX(gtk_hbox_new(FALSE, 2));
+	self->box = GTK_BOX(gtk_hbox_new(FALSE, 0));
 	
 #ifdef WIBUTI_WITH_BUTTONS
 	self->evbox = g_new(GtkEventBox *, WIBUTI_BUTTON_NUM);
@@ -139,7 +139,7 @@ void wibuti_widget_repack_with_string(WibutiWidget *self, const gchar *string) {
 
 #ifdef WIBUTI_WITH_TITLE
 			case 'T': {
-				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), FALSE, TRUE, 0);
+				gtk_box_pack_start(GTK_BOX(self->box), GTK_WIDGET(self->evbox_title), FALSE, TRUE, 4);
 				wibuti_widget_set_expand_title(self, self->expand_title);
 				self->use_title = TRUE;
 				break;

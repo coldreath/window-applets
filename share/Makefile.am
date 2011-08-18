@@ -94,5 +94,8 @@ new_hope_DATA = themes/new-hope/*.png
 blubuntudir = ${themesdir}/Blubuntu
 blubuntu_DATA = themes/blubuntu/*.png
 
+persephonadir = ${themesdir}/Persephona
+persephona_DATA = themes/persephona/*.png
+
 endif
 
